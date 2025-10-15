@@ -22,7 +22,6 @@ specifics     return RESERVED_KEYWORD;
 where         return RESERVED_KEYWORD;
 package       return RESERVED_KEYWORD;
 
- /* TODO: CLASS_STEREOTYPE */
 event        return CLASS_STEREOTYPE;
 situation    return CLASS_STEREOTYPE;
 process      return CLASS_STEREOTYPE;
@@ -43,8 +42,31 @@ phase        return CLASS_STEREOTYPE;
 role         return CLASS_STEREOTYPE;
 historicalRole  return CLASS_STEREOTYPE;
 
- 
- /* TODO: RELATION_STEREOTYPE */
+material     return RELATION_STEREOTYPE;
+derivation   return RELATION_STEREOTYPE;
+comparative  return RELATION_STEREOTYPE;
+mediation    return RELATION_STEREOTYPE;
+characterization return RELATION_STEREOTYPE;
+externalDependence return RELATION_STEREOTYPE;
+componentOf  return RELATION_STEREOTYPE;
+memberOf     return RELATION_STEREOTYPE;
+subCollectionOf return RELATION_STEREOTYPE;
+subQualityOf return RELATION_STEREOTYPE;
+instantiation return RELATION_STEREOTYPE;
+termination  return RELATION_STEREOTYPE;
+participational return RELATION_STEREOTYPE;
+participation return RELATION_STEREOTYPE;
+historicalDependence return RELATION_STEREOTYPE;
+creation     return RELATION_STEREOTYPE;
+manifestation return RELATION_STEREOTYPE;
+bringsAbout  return RELATION_STEREOTYPE;
+triggers     return RELATION_STEREOTYPE;
+composition  return RELATION_STEREOTYPE;
+aggregation  return RELATION_STEREOTYPE;
+inherence    return RELATION_STEREOTYPE;
+value        return RELATION_STEREOTYPE;
+formal       return RELATION_STEREOTYPE;
+constitution return RELATION_STEREOTYPE;
 
 number        return NATIVE_DT;
 string        return NATIVE_DT;
