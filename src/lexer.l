@@ -23,7 +23,27 @@ where         return RESERVED_KEYWORD;
 package       return RESERVED_KEYWORD;
 
  /* TODO: CLASS_STEREOTYPE */
+event        return CLASS_STEREOTYPE;
+situation    return CLASS_STEREOTYPE;
+process      return CLASS_STEREOTYPE;
+category     return CLASS_STEREOTYPE;
+mixin        return CLASS_STEREOTYPE;
+phaseMixin   return CLASS_STEREOTYPE;
+roleMixin    return CLASS_STEREOTYPE;
+historicalRoleMixin  return CLASS_STEREOTYPE;
+kind         return CLASS_STEREOTYPE;
+collective   return CLASS_STEREOTYPE;
+quantity     return CLASS_STEREOTYPE;
+quality      return CLASS_STEREOTYPE;
+mode         return CLASS_STEREOTYPE;
+intrinsicMode  return CLASS_STEREOTYPE;
+extrinsicMode  return CLASS_STEREOTYPE;
+subkind      return CLASS_STEREOTYPE;
+phase        return CLASS_STEREOTYPE;
+role         return CLASS_STEREOTYPE;
+historicalRole  return CLASS_STEREOTYPE;
 
+ 
  /* TODO: RELATION_STEREOTYPE */
 
 number        return NATIVE_DT;
