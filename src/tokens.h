@@ -1,4 +1,7 @@
-enum Token {
+#pragma once
+#include <string>
+
+enum TokenClass {
     RESERVED_KEYWORD = 1,
     SYMBOL,
     CLASS_STEREOTYPE,
@@ -11,3 +14,28 @@ enum Token {
     META_ATTRIBUTE,
     INVALID
 };
+
+class Token {
+    TokenClass  token_class;
+    std::string lexeme; 
+
+public:
+    Token(TokenClass tc, std::string lexeme) : token_class(tc), lexeme(lexeme) {}
+
+    TokenClass tokenClass() const {
+        return token_class;
+    }
+
+    void tokenClass(TokenClass token_class) {
+        this->token_class = token_class;
+    }
+
+    std::string Lexeme() const {
+        return lexeme;
+    }
+
+    void Lexeme(std::string lexeme) {
+        this->lexeme = lexeme;
+    }
+};
+
