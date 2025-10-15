@@ -38,4 +38,3 @@ public:
         this->lexeme = lexeme;
     }
 };
-
