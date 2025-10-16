@@ -9,7 +9,7 @@ delim        [ \t\n]
 ws           {delim}+
 class_id     [A-Z][A-Za-z_]+
 relation_id  [a-z][A-Za-z_]+
-instance_id  [A-Za-z_]+[0-9]+
+instance_id  [A-Za-z_]+[0-9]+({delim}|$)
 custom_dt    [A-Za-z]+DataType
 
 %%
@@ -85,7 +85,7 @@ redefines            return META_ATTRIBUTE;
 {custom_dt}          return CUSTOM_DT;
 {class_id}           return CLASS_ID;
 {relation_id}        return RELATION_ID;
-{instance_id}        return INSTANCE_ID;
+{instance_id}        {if (yytext[yyleng - 1] != '\0') yyless(yyleng - 1); return INSTANCE_ID;}
 
 "{"                  return SYMBOL;
 "}"                  return SYMBOL;
