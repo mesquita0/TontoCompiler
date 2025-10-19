@@ -1,5 +1,6 @@
 ﻿#include "scanner.h"
 #include <iostream>
+#include <iomanip>
 #include <string>
 
 int main()
@@ -25,8 +26,9 @@ int main()
 				case META_ATTRIBUTE:      token_class = "META_ATTRIBUTE"; break;
 			}
 
-			std::cout << token_class << ": \"" << token.Lexeme() << "\" at line " << token.LineNum()
-				      << ", column " << token.ColumnNum() << "." << std::endl;
+			std::cout << std::left << std::setw(19) << token_class << ": \"" 
+					  << token.Lexeme() << "\" at line " << token.LineNum()
+					  << ", column " << token.ColumnNum() << "." << std::endl;
 		}
 	}
 }
