@@ -11,10 +11,10 @@ bool Scanner::scan() {
 
     while ((lookahead = scanner.yylex()) != 0 && sucess) {
         if (lookahead != INVALID)
-            tokens.emplace_back((TokenClass) lookahead, scanner.YYText());
+            tokens.emplace_back((TokenClass) lookahead, scanner.YYText(), scanner.lineno());
         else {
-            std::cout << "Error at line " << scanner.lineno() << ". Token '"
-                      << scanner.YYText() << "' is invalid." << std::endl;
+            std::cout << "Error at line " << scanner.lineno() << ". Token \""
+                      << scanner.YYText() << "\" is invalid." << std::endl;
             sucess = false;
             tokens.clear();
         }

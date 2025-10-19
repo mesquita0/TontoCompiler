@@ -1,5 +1,14 @@
 %{
 #include "token.h"
+int yycolumn = 1;
+
+#define YY_USER_ACTION \
+    for (int i = 0; i < yyleng; i++) { \
+        if (yytext[i] == '\n') \
+            yycolumn = 1; \
+        else \
+            yycolumn++; \
+    }
 %}
 
 %option noyywrap c++

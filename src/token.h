@@ -1,6 +1,8 @@
 #pragma once
 #include <string>
 
+extern int yycolumn;
+
 enum TokenClass {
     RESERVED_KEYWORD = 1,
     SYMBOL,
@@ -18,9 +20,13 @@ enum TokenClass {
 class Token {
     TokenClass  token_class;
     std::string lexeme; 
+    int line, column;
 
 public:
-    Token(TokenClass tc, std::string lexeme) : token_class(tc), lexeme(lexeme) {}
+    Token(TokenClass tc, std::string lexeme, int line)
+     : token_class(tc), lexeme(lexeme), line(line) { 
+        column = yycolumn - lexeme.length();
+    }
 
     TokenClass tokenClass() const {
         return token_class;
@@ -36,5 +42,13 @@ public:
 
     void Lexeme(std::string lexeme) {
         this->lexeme = lexeme;
+    }
+
+    int LineNum() const {
+        return line;
+    }
+
+    int ColumnNum() const {
+        return column;
     }
 };

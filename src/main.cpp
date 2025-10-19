@@ -25,7 +25,8 @@ int main()
 				case META_ATTRIBUTE:      token_class = "META_ATTRIBUTE"; break;
 			}
 
-			std::cout << token_class << ":" << token.Lexeme() << std::endl;
+			std::cout << token_class << ": \"" << token.Lexeme() << "\" at line " << token.LineNum()
+				      << ", column " << token.ColumnNum() << "." << std::endl;
 		}
 	}
 }
