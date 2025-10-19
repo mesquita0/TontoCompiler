@@ -109,6 +109,6 @@ redefines            return META_ATTRIBUTE;
 "@"                  return SYMBOL;
 ":"                  return SYMBOL;
         
-.                    return INVALID;
+.+                   return INVALID;
 
 %%
