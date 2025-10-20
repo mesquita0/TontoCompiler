@@ -31,6 +31,8 @@ general              return RESERVED_KEYWORD;
 specifics            return RESERVED_KEYWORD;
 where                return RESERVED_KEYWORD;
 package              return RESERVED_KEYWORD;
+import               return RESERVED_KEYWORD;
+functional-complexes return RESERVED_KEYWORD;
 
 event                return CLASS_STEREOTYPE;
 situation            return CLASS_STEREOTYPE;
@@ -109,6 +111,6 @@ redefines            return META_ATTRIBUTE;
 "@"                  return SYMBOL;
 ":"                  return SYMBOL;
         
-.+                   return INVALID;
+.                    return INVALID;
 
 %%
