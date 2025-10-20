@@ -5,16 +5,16 @@
 
 std::string class_str[] = {
 	"",
-	"RESERVED_KEYWORD",
-	"SYMBOL",
-	"CLASS_STEREOTYPE",
-	"CLASS_ID",
-	"RELATION_STEREOTYPE",
-	"RELATION_ID",
-	"INSTANCE_ID",
-	"NATIVE_DT",
-	"CUSTOM_DT",
-	"META_ATTRIBUTE"
+	"Reserved Keyword",
+	"Symbol",
+	"Class Stereotype",
+	"Class Identifier",
+	"Relation Stereotype",
+	"Relation Identifier",
+	"Instance Identifier",
+	"Native Datatype",
+	"Custom Datatype",
+	"Meta Attribute"
 };
 
 int main() {
@@ -23,6 +23,8 @@ int main() {
 
 	if (sucess) {
 		int counts[11] = {};
+
+		std::cout << "Token List" << std::endl;
 
 		for (const Token& token : scanner) {
 			++counts[token.tokenClass()];

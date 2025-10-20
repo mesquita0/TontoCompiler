@@ -33,6 +33,8 @@ general              return RESERVED_KEYWORD;
 specifics            return RESERVED_KEYWORD;
 where                return RESERVED_KEYWORD;
 package              return RESERVED_KEYWORD;
+import               return RESERVED_KEYWORD;
+functional-complexes return RESERVED_KEYWORD;
 
 event                return CLASS_STEREOTYPE;
 situation            return CLASS_STEREOTYPE;
@@ -53,6 +55,8 @@ subkind              return CLASS_STEREOTYPE;
 phase                return CLASS_STEREOTYPE;
 role                 return CLASS_STEREOTYPE;
 historicalRole       return CLASS_STEREOTYPE;
+
+intrinsic-modes      return CLASS_STEREOTYPE;
 
 material             return RELATION_STEREOTYPE;
 derivation           return RELATION_STEREOTYPE;
@@ -110,7 +114,9 @@ redefines            return META_ATTRIBUTE;
 "*"                  return SYMBOL;
 "@"                  return SYMBOL;
 ":"                  return SYMBOL;
-     
+
+","                  return SYMBOL;
+        
 .                    return INVALID;
 
 %%
