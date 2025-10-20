@@ -25,7 +25,7 @@ class Token {
 public:
     Token(TokenClass tc, std::string lexeme, int line)
      : token_class(tc), lexeme(lexeme), line(line) { 
-        column = yycolumn - lexeme.length();
+        column = yycolumn;
     }
 
     TokenClass tokenClass() const {

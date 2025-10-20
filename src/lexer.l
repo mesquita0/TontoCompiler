@@ -1,13 +1,15 @@
 %{
 #include "token.h"
 int yycolumn = 1;
+int tmpcolumn = 1;
 
 #define YY_USER_ACTION \
+    yycolumn = tmpcolumn; \
     for (int i = 0; i < yyleng; i++) { \
         if (yytext[i] == '\n') \
-            yycolumn = 1; \
+            tmpcolumn = 1; \
         else \
-            yycolumn++; \
+            tmpcolumn++; \
     }
 %}
 
@@ -108,7 +110,7 @@ redefines            return META_ATTRIBUTE;
 "*"                  return SYMBOL;
 "@"                  return SYMBOL;
 ":"                  return SYMBOL;
-        
-.+                   return INVALID;
+     
+.                    return INVALID;
 
 %%
