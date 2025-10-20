@@ -2,6 +2,7 @@
 #include <string>
 
 extern int yycolumn;
+extern std::string error_token;
 
 enum TokenClass {
     RESERVED_KEYWORD = 1,

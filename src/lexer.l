@@ -1,7 +1,9 @@
 %{
 #include "token.h"
+#include <string>
 int yycolumn = 1;
 int tmpcolumn = 1;
+std::string error_token = "";
 
 #define YY_USER_ACTION \
     yycolumn = tmpcolumn; \
@@ -117,6 +119,14 @@ redefines            return META_ATTRIBUTE;
 
 ","                  return SYMBOL;
         
-.                    return INVALID;
+. {
+    error_token.push_back(yytext[0]);
+    
+    int c;
+    while ((c = yyinput()) != EOF && c != ' ' && c != '\t' && c != '\n')
+        error_token.push_back(c);
+
+    return INVALID;
+}
 
 %%
