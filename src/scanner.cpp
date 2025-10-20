@@ -13,8 +13,8 @@ bool Scanner::scan() {
         if (lookahead != INVALID)
             tokens.emplace_back((TokenClass) lookahead, scanner.YYText(), scanner.lineno());
         else {
-            std::cout << "Error at line " << scanner.lineno() << ". Token \""
-                      << scanner.YYText() << "\" is invalid." << std::endl;
+            std::cout << "Error at line " << scanner.lineno() << ", column " << yycolumn
+                      << ". Token \"" << scanner.YYText() << "\" is invalid." << std::endl;
             sucess = false;
             tokens.clear();
         }
