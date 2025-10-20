@@ -54,6 +54,8 @@ phase                return CLASS_STEREOTYPE;
 role                 return CLASS_STEREOTYPE;
 historicalRole       return CLASS_STEREOTYPE;
 
+intrinsic-modes      return CLASS_STEREOTYPE;
+
 material             return RELATION_STEREOTYPE;
 derivation           return RELATION_STEREOTYPE;
 comparative          return RELATION_STEREOTYPE;
@@ -110,6 +112,8 @@ redefines            return META_ATTRIBUTE;
 "*"                  return SYMBOL;
 "@"                  return SYMBOL;
 ":"                  return SYMBOL;
+
+","                  return SYMBOL;
         
 .                    return INVALID;
 
