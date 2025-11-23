@@ -139,8 +139,14 @@ meta_attribute:
 
 // Type declaration
 type_decl:
+      KW_DATATYPE CLASS_ID SYM_LBRACE datatype_elements SYM_RBRACE
     ;
 
+datatype_elements:
+        datatype_elements attribute_decl
+        |attribute_decl
+        |
+    ;
 
 // Enum declaration
 enum_decl:
