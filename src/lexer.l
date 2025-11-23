@@ -49,6 +49,7 @@ types                  return KW_TYPES;
 abstract-individuals   return KW_ABSTRACT_INDIVIDUALS;
 quantities             return KW_QUANTITIES;
 relators               return KW_RELATORS;
+specializes            return KW_SPECIALIZES;
  
 event                 return CLASS_STEREOTYPE;
 situation             return CLASS_STEREOTYPE;
