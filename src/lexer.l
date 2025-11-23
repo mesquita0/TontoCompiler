@@ -1,8 +1,6 @@
 %{
-#include "token.h"
+#include "parser.h"
 #include <string>
-
-using namespace TokenClass;
 
 int yycolumn = 1;
 int tmpcolumn = 1;
@@ -31,26 +29,26 @@ custom_dt    [A-Za-z]+DataType
 %%
 {ws}                  ;
 
-genset                return RESERVED_KEYWORD;
-disjoint              return RESERVED_KEYWORD;
-complete              return RESERVED_KEYWORD;
-general               return RESERVED_KEYWORD;
-specifics             return RESERVED_KEYWORD;
-where                 return RESERVED_KEYWORD;
-package               return RESERVED_KEYWORD;
-import                return RESERVED_KEYWORD;
-functional-complexes  return RESERVED_KEYWORD;
-as                    return RESERVED_KEYWORD;
-datatype              return RESERVED_KEYWORD;
-enum                  return RESERVED_KEYWORD;
-relation              return RESERVED_KEYWORD;
-instanceOf            return RESERVED_KEYWORD;
-of                    return RESERVED_KEYWORD;
-objects               return RESERVED_KEYWORD;
-types                 return RESERVED_KEYWORD;
-abstract-individuals  return RESERVED_KEYWORD;
-quantities            return RESERVED_KEYWORD;
-relators              return RESERVED_KEYWORD;
+genset                 return KW_GENSET;
+disjoint               return KW_DISJOINT;
+complete               return KW_COMPLETE;
+general                return KW_GENERAL;
+specifics              return KW_SPECIFICS;
+where                  return KW_WHERE;
+package                return KW_PACKAGE;
+import                 return KW_IMPORT;
+functional-complexes   return KW_FUNCTIONAL_COMPLEXES;
+as                     return KW_AS;
+datatype               return KW_DATATYPE;
+enum                   return KW_ENUM;
+relation               return KW_RELATION;
+instanceOf             return KW_INSTANCEOF;
+of                     return KW_OF;
+objects                return KW_OBJECTS;
+types                  return KW_TYPES;
+abstract-individuals   return KW_ABSTRACT_INDIVIDUALS;
+quantities             return KW_QUANTITIES;
+relators               return KW_RELATORS;
  
 event                 return CLASS_STEREOTYPE;
 situation             return CLASS_STEREOTYPE;
@@ -119,23 +117,25 @@ redefines             return META_ATTRIBUTE;
 {relation_id}         return RELATION_ID;
 {instance_id}         {if (yytext[yyleng - 1] != '\0') yyless(yyleng - 1); return INSTANCE_ID;}
 
-"{"                   return SYMBOL;
-"}"                   return SYMBOL;
-"("                   return SYMBOL;
-")"                   return SYMBOL;
-"["                   return SYMBOL;
-"]"                   return SYMBOL;
-"<o>--"               return SYMBOL;
-"<>--"                return SYMBOL;
-"--<>"                return SYMBOL;
-"--"                  return SYMBOL;
-"*"                   return SYMBOL;
-"@"                   return SYMBOL;
-":"                   return SYMBOL;
-","                   return SYMBOL;
-"."                   return SYMBOL;
-".."                  return SYMBOL;
-"="                   return SYMBOL;
+"{"                    return SYM_LBRACE;
+"}"                    return SYM_RBRACE;
+"("                    return SYM_LPAREN;
+")"                    return SYM_RPAREN;
+"["                    return SYM_LBRACKET;
+"]"                    return SYM_RBRACKET;
+
+"<o>--"                return SYM_ASSOC_O;
+"<>--"                 return SYM_ASSOC_EMPTY;
+"--<>"                 return SYM_ASSOC_EMPTY_R;
+"--"                   return SYM_DASH;
+
+"*"                    return SYM_STAR;
+"@"                    return SYM_AT;
+":"                    return SYM_COLON;
+","                    return SYM_COMMA;
+"."                    return SYM_DOT;
+".."                   return SYM_DOTDOT;
+"="                    return SYM_EQUAL;
         
 . {
     error_token.push_back(yytext[0]);

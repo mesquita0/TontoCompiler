@@ -1,13 +1,13 @@
 #include "scanner.h"
 #include <FlexLexer.h>
-#include <list>
 #include "token.h"
+#include "parser.h"
 #include <iostream>
 
 Token Scanner::scan() {
-    TokenClass::T token_class = (TokenClass::T) scanner.yylex();
+    TokenClass token_class = (TokenClass) scanner.yylex();
 
-    if (token_class == TokenClass::INVALID) {
+    if (token_class == (TokenClass) INVALID) {
         std::cout << "Error at line " << scanner.lineno() << ", column " << yycolumn
                     << ". Token \"" << error_token << "\" is invalid." << std::endl;
     }
