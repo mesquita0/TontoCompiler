@@ -150,8 +150,13 @@ datatype_elements:
 
 // Enum declaration
 enum_decl:
+        KW_ENUM CLASS_ID SYM_LBRACE enum_elements SYM_RBRACE
     ;
 
+enum_elements:
+        INSTANCE_ID SYM_COMMA enum_elements
+        | INSTANCE_ID
+    ;
 
 // Genelarization declaration
 gen_decl:
