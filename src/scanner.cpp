@@ -4,21 +4,13 @@
 #include "token.h"
 #include <iostream>
 
-bool Scanner::scan() {
-    int lookahead;
-    sucess = true;
-    tokens = {};
+Token Scanner::scan() {
+    TokenClass::T token_class = (TokenClass::T) scanner.yylex();
 
-    while ((lookahead = scanner.yylex()) != 0 && sucess) {
-        if (lookahead != INVALID)
-            tokens.emplace_back((TokenClass) lookahead, scanner.YYText(), scanner.lineno());
-        else {
-            std::cout << "Error at line " << scanner.lineno() << ", column " << yycolumn
-                      << ". Token \"" << error_token << "\" is invalid." << std::endl;
-            sucess = false;
-            tokens.clear();
-        }
+    if (token_class == TokenClass::INVALID) {
+        std::cout << "Error at line " << scanner.lineno() << ", column " << yycolumn
+                    << ". Token \"" << error_token << "\" is invalid." << std::endl;
     }
 
-    return sucess;
+    return Token(token_class, scanner.YYText(), scanner.lineno());
 }

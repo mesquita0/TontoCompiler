@@ -4,36 +4,40 @@
 extern int yycolumn;
 extern std::string error_token;
 
-enum TokenClass {
-    RESERVED_KEYWORD = 1,
-    SYMBOL,
-    CLASS_STEREOTYPE,
-    CLASS_ID,
-    RELATION_STEREOTYPE,
-    RELATION_ID,
-    INSTANCE_ID,
-    NATIVE_DT,
-    CUSTOM_DT,
-    META_ATTRIBUTE,
-    INVALID
-};
+namespace TokenClass {
+    enum T {
+        RESERVED_KEYWORD = 1,
+        SYMBOL,
+        CLASS_STEREOTYPE,
+        CLASS_ID,
+        RELATION_STEREOTYPE,
+        RELATION_ID,
+        INSTANCE_ID,
+        NATIVE_DT,
+        CUSTOM_DT,
+        META_ATTRIBUTE,
+        INVALID
+    };
+}
 
 class Token {
-    TokenClass  token_class;
+    TokenClass::T  token_class;
     std::string lexeme; 
     int line, column;
 
 public:
-    Token(TokenClass tc, std::string lexeme, int line)
+    Token() : token_class(TokenClass::INVALID), lexeme(""), line(0), column(0) {}
+
+    Token(TokenClass::T tc, std::string lexeme, int line)
      : token_class(tc), lexeme(lexeme), line(line) { 
         column = yycolumn;
     }
 
-    TokenClass tokenClass() const {
+    TokenClass::T tokenClass() const {
         return token_class;
     }
 
-    void tokenClass(TokenClass token_class) {
+    void tokenClass(TokenClass::T token_class) {
         this->token_class = token_class;
     }
 

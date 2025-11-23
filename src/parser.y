@@ -1,10 +1,25 @@
+%define api.value.type { Token }
+
 %{
 #include <stdio.h>
-#include <FlexLexer.h>
+#include "scanner.h"
 
+extern Token yylval;
 extern int yylex();
 extern int yyerror(const char *s);
 %}
+
+%token RESERVED_KEYWORD
+%token SYMBOL
+%token CLASS_STEREOTYPE
+%token CLASS_ID
+%token RELATION_STEREOTYPE
+%token RELATION_ID
+%token INSTANCE_ID
+%token NATIVE_DT
+%token CUSTOM_DT
+%token META_ATTRIBUTE
+%token INVALID
 
 %%
 
@@ -14,9 +29,10 @@ input:
 %%
 
 int yylex() {
-    static yyFlexLexer lexer; 
+    static Scanner scanner;
 
-    return lexer.yylex(); 
+    yylval = scanner.scan(); 
+    return yylval.tokenClass();
 }
 
 int yyerror(const char *s) {

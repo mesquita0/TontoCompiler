@@ -1,6 +1,9 @@
 %{
 #include "token.h"
 #include <string>
+
+using namespace TokenClass;
+
 int yycolumn = 1;
 int tmpcolumn = 1;
 std::string error_token = "";
