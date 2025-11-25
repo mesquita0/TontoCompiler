@@ -75,7 +75,6 @@ tonto_model:
 
 package_decl:
       KW_PACKAGE CLASS_ID
-    | error { yyerror("Package declaration is required at the start of the file."); yyerrok; }
     ;
 
 import_decl:
