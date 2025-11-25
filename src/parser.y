@@ -56,6 +56,7 @@ extern int yyerror(const char *s);
 %token SYM_EQUAL         // =
 
 
+%token INT
 %token CLASS_STEREOTYPE
 %token CLASS_ID
 %token RELATION_STEREOTYPE
@@ -87,7 +88,7 @@ declarations:
     |   declarations type_decl
     |   declarations enum_decl
     |   declarations gen_decl
-    |   declarations relation_decl
+    |   declarations ex_relation_decl
     |     
     ;
 
@@ -108,14 +109,16 @@ classes:
     ;
 
 class_body:
-      SYM_LBRACE class_elements SYM_RBRACE
-    | SYM_LPAREN instance_decl SYM_RPAREN
+        SYM_LBRACE class_elements SYM_RBRACE
+    |   SYM_LPAREN instance_decl SYM_RPAREN
     |
     ;
 
 class_elements:
-      class_elements attribute_decl
-    | attribute_decl
+        class_elements attribute_decl
+    |   class_elements in_relation_decl
+    |   attribute_decl  
+    |   in_relation_decl 
     ;
 
 attribute_decl:
@@ -144,9 +147,10 @@ type_decl:
 
 datatype_elements:
         datatype_elements attribute_decl
-        |attribute_decl
-        |
+    |   attribute_decl
+    |   
     ;
+
 
 // Enum declaration
 enum_decl:
@@ -155,20 +159,86 @@ enum_decl:
 
 enum_elements:
         INSTANCE_ID SYM_COMMA enum_elements
-        | INSTANCE_ID
+    |   INSTANCE_ID
     ;
+
 
 // Genelarization declaration
 gen_decl:
+    opt_disjoint opt_complete KW_GENSET CLASS_ID gen_body
+    ;
+
+opt_disjoint:
+        KW_DISJOINT
+    |
+    ;
+
+opt_complete:
+        KW_COMPLETE
+    |
+    ;
+
+gen_body:
+        gen_where
+    |   SYM_LBRACKET gen_elements SYM_RBRACKET
+    ;
+
+gen_elements:
+        gen_elements gen_element
+    |   gen_element
+    ;
+
+gen_element:
+        KW_GENERAL CLASS_ID
+    |   KW_SPECIFICS class_list
+    ;
+
+gen_where:
+        KW_WHERE class_list KW_SPECIALIZES CLASS_ID
+    |
+    ;
+
+class_list:
+        CLASS_ID SYM_COMMA class_list
+    |   CLASS_ID
     ;
 
 
-// Relation declaration
-relation_decl:
-      RELATION_STEREOTYPE RELATION_ID relation_body
+// Internal relation declaration
+in_relation_decl:
+        SYM_AT RELATION_STEREOTYPE relation_body
     ;
 
 relation_body:
+        cardinality relation_connector cardinality CLASS_ID
+    ;
+
+cardinality:
+        SYM_LBRACKET cardinality_bound cardinality_range SYM_LBRACKET
+    |
+    ;
+
+cardinality_bound:
+        INT
+    |   SYM_STAR   
+    ;
+
+cardinality_range:
+        SYM_DOTDOT cardinality_bound
+    |
+    ;
+
+relation_connector:
+        SYM_ASSOC_O
+    |   SYM_ASSOC_EMPTY
+    |   SYM_ASSOC_EMPTY_R
+    |   SYM_DASH
+    ;
+
+
+// External relation declaration
+ex_relation_decl:
+      SYM_AT RELATION_STEREOTYPE RELATION_ID relation_body
     ;
 
 %%
