@@ -9,6 +9,6 @@ ADD_FLEX_BISON_DEPENDENCY(Lexer Parser)
 include_directories(${CMAKE_CURRENT_BINARY_DIR})
 include_directories(${CMAKE_CURRENT_SOURCE_DIR})
 
-set(SOURCES main.cpp scanner.cpp)
+set(SOURCES main.cpp scanner.cpp AST.cpp)
 
 add_executable(TontoCompiler ${SOURCES} ${FLEX_Lexer_OUTPUTS} ${BISON_Parser_OUTPUTS})
