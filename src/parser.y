@@ -1,4 +1,5 @@
 %define api.value.type { Token }
+%define parse.error verbose
 
 %code requires {
     #include "AST.h"
@@ -21,6 +22,10 @@ Genset* current_genset;
 
 bool is_internal_relation;
 std::string relation_id;
+
+int yylineno = 1;
+extern int yycolumn;
+extern std::string error_token;
 
 extern Token yylval;
 extern int yylex();
@@ -107,6 +112,7 @@ declarations:
     |   declarations enum_decl
     |   declarations gen_decl
     |   declarations ex_relation_decl
+    |   declarations error SYM_RBRACE { yyerrok; }  
     |     
     ;
 
@@ -316,11 +322,77 @@ ex_relation_decl:
 int yylex() {
     static Scanner scanner;
 
-    yylval = scanner.scan(); 
+    yylval = scanner.scan();
+    yylineno = yylval.LineNum();
+    yycolumn = yylval.ColumnNum();
+   
+    try {
+        error_token = yylval.Lexeme();
+    } catch (...) {
+        error_token = "<unknown>";
+    }
+
+    yycolumn = yylval.ColumnNum();
+
     return yylval.tokenClass();
 }
 
+static std::string suggest_fix(const std::string &unexpected, const char *msg) {
+    std::string suggestion;
+    std::string m(msg);
+  
+    if (m.find("expecting SYM_RBRACE") != std::string::npos)
+        suggestion = "You may be missing a '}' to close a block.";
+    else if (m.find("expecting SYM_LBRACE") != std::string::npos)
+        suggestion = "You may be missing a '{' after this declaration.";
+
+   
+    else if (m.find("unexpected CLASS_ID") != std::string::npos) {
+        suggestion = "You are missing an ontological stereotype (e.g., 'kind', 'role', 'subkind', 'phase') before the class name.";
+    }
+
+    else if (m.find("unexpected RELATION_ID") != std::string::npos && 
+            (m.find("expecting SYM_AT") != std::string::npos || m.find("expecting CLASS_ID") != std::string::npos)) {
+        suggestion = "You seem to be defining an attribute inside a class. Check if you are missing a colon ':' after the name, or if the attribute name follows the correct casing rules.";
+    }
+
+    else if (m.find("expecting CLASS_ID") != std::string::npos)
+        suggestion = "A class identifier (CLASS_ID) was expected. Check for typos or capitalization.";
+    else if (m.find("expecting RELATION_ID") != std::string::npos)
+        suggestion = "A relation identifier (RELATION_ID) was expected.";
+    else if (m.find("expecting INSTANCE_ID") != std::string::npos)
+        suggestion = "An instance identifier (INSTANCE_ID) was expected inside the enum list.";
+
+    else if (unexpected == ";")
+        suggestion = "Unexpected ';'. The Tonto language does not use semicolons here.";
+    else if (unexpected == "{")
+        suggestion = "Unexpected '{'. Perhaps the block was opened too early.";
+    else if (unexpected == "}")
+        suggestion = "Unexpected '}'. A block may have been closed too soon.";
+    
+  
+    else if (unexpected == "<o>--" || unexpected == "<>--" || unexpected == "--<>" || unexpected == "--")
+        suggestion = "Relation connectors must appear inside an internal or external relation declaration structure.";
+    
+    else
+        suggestion = "Check the syntax around this location; something appears malformed.";
+
+    return suggestion;
+}
+
 int yyerror(AST* ast, const char *s) {
-    fprintf(stderr, "Error: %s\n", s);
+    std::string suggestion = suggest_fix(error_token, s);
+
+    fprintf(stderr,
+        "[Line %d, Column %d]\n"
+        "Syntax error near '%s': %s\n"
+        "Suggestion: %s\n\n",
+        yylineno,
+        yycolumn,
+        error_token.c_str(),
+        s,
+        suggestion.c_str()
+    );
+
     return 0;
 }
