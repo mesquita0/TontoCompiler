@@ -1,17 +1,33 @@
 %define api.value.type { Token }
 
 %code requires {
+    #include "AST.h"
     #include "token.h"
 }
 
 %{
-#include <stdio.h>
+#include "AST.h"
 #include "scanner.h"
+#include <stdio.h>
+#include <string>
+
+// Variables for ast
+Node* current_package;
+Node* current_class;
+Node* current_type;
+Node* current_enum;
+Node* current_attribute_context;
+Genset* current_genset;
+
+bool is_internal_relation;
+std::string relation_id;
 
 extern Token yylval;
 extern int yylex();
-extern int yyerror(const char *s);
+extern int yyerror(AST* ast, const char *s);
 %}
+
+%parse-param { AST* ast }
 
 // Keywords
 %token KW_GENSET
@@ -70,15 +86,18 @@ extern int yyerror(const char *s);
 %%
 
 tonto_model:
-      package_decl import_decl declarations
+        package_decl import_decl declarations
     ;
 
 package_decl:
-      KW_PACKAGE CLASS_ID
+        KW_PACKAGE CLASS_ID
+        {
+            current_package = ast->add_package($2.Lexeme());
+        }
     ;
 
-import_decl:
-      import_decl KW_IMPORT CLASS_ID
+import_decl:    
+        import_decl KW_IMPORT CLASS_ID
     |
     ;
 
@@ -95,6 +114,10 @@ declarations:
 // Class declaration
 class_decl:
         CLASS_STEREOTYPE CLASS_ID specializes_decl class_body
+        {
+            current_class = ast->add_class((Package*) current_package, $2.Lexeme());
+            current_attribute_context = current_class;
+        }
     ;
 
 specializes_decl:
@@ -121,12 +144,15 @@ class_elements:
     ;
 
 attribute_decl:
-      CLASS_ID SYM_COLON type meta_attribute
+        CLASS_ID SYM_COLON type meta_attribute
+        {
+            ast->add_attribute(current_attribute_context, $1.Lexeme(), $3.Lexeme());
+        }
     ;
 
 type:
-      NATIVE_DT
-    | CUSTOM_DT
+        NATIVE_DT
+    |   CUSTOM_DT
     ;
 
 instance_decl:
@@ -134,14 +160,18 @@ instance_decl:
     ;
 
 meta_attribute:
-      SYM_LBRACE META_ATTRIBUTE SYM_RBRACE
+        SYM_LBRACE META_ATTRIBUTE SYM_RBRACE
     |
     ;
 
 
 // Type declaration
 type_decl:
-      KW_DATATYPE CLASS_ID SYM_LBRACE datatype_elements SYM_RBRACE
+        KW_DATATYPE CLASS_ID SYM_LBRACE datatype_elements SYM_RBRACE
+        {
+            current_type = ast->add_type((Package*) current_package, $1.Lexeme());
+            current_attribute_context = current_type;
+        }
     ;
 
 datatype_elements:
@@ -154,17 +184,30 @@ datatype_elements:
 // Enum declaration
 enum_decl:
         KW_ENUM CLASS_ID SYM_LBRACE enum_elements SYM_RBRACE
+        {
+            current_enum = ast->add_enum((Package*) current_package, $2.Lexeme());
+        }
     ;
 
 enum_elements:
-        INSTANCE_ID SYM_COMMA enum_elements
-    |   INSTANCE_ID
+        enum_element SYM_COMMA enum_elements
+    |   enum_element   
+    ;
+
+enum_element:
+        INSTANCE_ID
+        {
+            ast->add_instance((Enum*) current_enum, $1.Lexeme());
+        }
     ;
 
 
 // Genelarization declaration
 gen_decl:
-    opt_disjoint opt_complete KW_GENSET CLASS_ID gen_body
+        opt_disjoint opt_complete KW_GENSET CLASS_ID gen_body
+        {
+            current_genset = (Genset*) ast->add_genset((Package*) current_package, $4.Lexeme());
+        }
     ;
 
 opt_disjoint:
@@ -189,27 +232,51 @@ gen_elements:
 
 gen_element:
         KW_GENERAL CLASS_ID
+        {
+            current_genset->setMotherClass($2.Lexeme());
+        }
     |   KW_SPECIFICS class_list
     ;
 
 gen_where:
         KW_WHERE class_list KW_SPECIALIZES CLASS_ID
+         {
+            current_genset->setMotherClass($4.Lexeme());
+        }
     |
     ;
 
 class_list:
-        CLASS_ID SYM_COMMA class_list
-    |   CLASS_ID
+        class_name SYM_COMMA class_list
+    |   class_name
+    ;
+
+class_name:
+        CLASS_ID
+        {
+            current_genset->addClass($1.Lexeme());
+        }
     ;
 
 
 // Internal relation declaration
 in_relation_decl:
         SYM_AT RELATION_STEREOTYPE relation_body
+        {
+            is_internal_relation = true;
+        }
     ;
 
 relation_body:
         cardinality relation_connector cardinality CLASS_ID
+        {
+            if (is_internal_relation) {
+                ast->add_relation((Class*) current_class, $4.Lexeme());
+            }
+            else {
+                ast->add_relation((Package*) current_package, relation_id, $4.Lexeme());
+            }
+        }
     ;
 
 cardinality:
@@ -237,7 +304,11 @@ relation_connector:
 
 // External relation declaration
 ex_relation_decl:
-      SYM_AT RELATION_STEREOTYPE RELATION_ID relation_body
+        SYM_AT RELATION_STEREOTYPE RELATION_ID relation_body 
+        {
+            is_internal_relation = false;
+            relation_id = $3.Lexeme();
+        }
     ;
 
 %%
@@ -249,7 +320,7 @@ int yylex() {
     return yylval.tokenClass();
 }
 
-int yyerror(const char *s) {
+int yyerror(AST* ast, const char *s) {
     fprintf(stderr, "Error: %s\n", s);
     return 0;
 }

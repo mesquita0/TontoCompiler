@@ -1,8 +1,11 @@
-﻿#include "parser.h"
+﻿#include "AST.h"
+#include "parser.h"
 #include <iostream>
 #include <iomanip>
 #include <string>
 
 int main() {
-	yyparse();
+	AST ast = AST();
+
+	yyparse(&ast);
 }

@@ -58,11 +58,14 @@ public:
 
 class Genset : public Node {
     std::string mother_class;
+    std::list<std::string> classes;
 
 public:
     Genset(std::string name, std::string mother_class) : Node(name), mother_class(mother_class) { }
 
     void setMotherClass(std::string mother_class) { this->mother_class = mother_class; }
+
+    void addClass(std::string gen_class) { this->classes.push_back(gen_class); }
 };
 
 class AST {
