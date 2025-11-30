@@ -175,7 +175,7 @@ meta_attribute:
 type_decl:
         KW_DATATYPE CLASS_ID SYM_LBRACE datatype_elements SYM_RBRACE
         {
-            current_type = ast->add_type((Package*) current_package, $1.Lexeme());
+            current_type = ast->add_type((Package*) current_package, $2.Lexeme());
             current_attribute_context = current_type;
         }
     ;
@@ -286,7 +286,7 @@ relation_body:
     ;
 
 cardinality:
-        SYM_LBRACKET cardinality_bound cardinality_range SYM_LBRACKET
+        SYM_LBRACKET cardinality_bound cardinality_range SYM_RBRACKET
     |
     ;
 
