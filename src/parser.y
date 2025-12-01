@@ -357,47 +357,64 @@ int yylex() {
     return yylval.tokenClass();
 }
 
-static std::string suggest_fix(const std::string &unexpected, const char *msg) {
-    std::string suggestion;
+static std::string suggest_fix(const std::string& unexpected, const char* msg) {
     std::string m(msg);
-  
-    if (m.find("expecting SYM_RBRACE") != std::string::npos)
-        suggestion = "You may be missing a '}' to close a block.";
-    else if (m.find("expecting SYM_LBRACE") != std::string::npos)
-        suggestion = "You may be missing a '{' after this declaration.";
 
-   
-    else if (m.find("unexpected CLASS_ID") != std::string::npos) {
-        suggestion = "You are missing an ontological stereotype (e.g., 'kind', 'role', 'subkind', 'phase') before the class name.";
+    // package
+    if (m.find("expecting KW_PACKAGE") != std::string::npos) {
+        return "Every Tonto file must start with a 'package PackageName' declaration.";
     }
 
-    else if (m.find("unexpected RELATION_ID") != std::string::npos && 
-            (m.find("expecting SYM_AT") != std::string::npos || m.find("expecting CLASS_ID") != std::string::npos)) {
-        suggestion = "You seem to be defining an attribute inside a class. Check if you are missing a colon ':' after the name, or if the attribute name follows the correct casing rules.";
+    // atributo
+    if (m.find("unexpected RELATION_ID") != std::string::npos && 
+        (m.find("expecting SYM_AT") != std::string::npos || m.find("expecting CLASS_ID") != std::string::npos)) {
+        return "Looks like an attribute declaration (" + unexpected + "). Missing ':' before the type, or check if it represents an internal relation.";
     }
 
-    else if (m.find("expecting CLASS_ID") != std::string::npos)
-        suggestion = "A class identifier (CLASS_ID) was expected. Check for typos or capitalization.";
-    else if (m.find("expecting RELATION_ID") != std::string::npos)
-        suggestion = "A relation identifier (RELATION_ID) was expected.";
-    else if (m.find("expecting INSTANCE_ID") != std::string::npos)
-        suggestion = "An instance identifier (INSTANCE_ID) was expected inside the enum list.";
+    // datatype
+    if (m.find("unexpected CUSTOM_DT") != std::string::npos) {
+        return "Unknown type. If this is a custom type, ensure it is declared with 'datatype Name { ... }' before use.";
+    }
 
-    else if (unexpected == ";")
-        suggestion = "Unexpected ';'. The Tonto language does not use semicolons here.";
-    else if (unexpected == "{")
-        suggestion = "Unexpected '{'. Perhaps the block was opened too early.";
-    else if (unexpected == "}")
-        suggestion = "Unexpected '}'. A block may have been closed too soon.";
-    
-  
-    else if (unexpected == "<o>--" || unexpected == "<>--" || unexpected == "--<>" || unexpected == "--")
-        suggestion = "Relation connectors must appear inside an internal or external relation declaration structure.";
-    
-    else
-        suggestion = "Check the syntax around this location; something appears malformed.";
+    // bloco
+    if (unexpected == "{") return "Unexpected '{'. Block opened too early, or missing class/relation name?";
+    if (unexpected == "}") return "Unexpected '}'. Block closed prematurely?";
 
-    return suggestion;
+    //conectores
+    if (unexpected == "<o>--" || unexpected == "<>--" || unexpected == "--<>" || unexpected == "--")
+        return "Relation connector out of context. Check syntax: @stereotype [card] connector [card] Class.";
+
+    // classes e esteriótipos
+    if (m.find("unexpected CLASS_ID") != std::string::npos) {
+        if (m.find("expecting KW_RELATION") != std::string::npos)
+             return "Missing 'relation' keyword after the relation stereotype (@mediation, @material, etc).";
+        
+        if (m.find("expecting KW_GENERAL") != std::string::npos)
+             return "Inside a genset, expected 'general' keyword to define the parent class.";
+
+        return "Unexpected class name here. Missing a stereotype before? (Ex: kind, phase, role, subkind, category).";
+    }
+ 
+    // enum
+    if (m.find("unexpected INSTANCE_ID") != std::string::npos) {
+        return "Instance found outside an enum? Verify if it is inside an 'enum Name { ... }' block.";
+    }
+
+    // genset
+    if (m.find("expecting KW_SPECIFICS") != std::string::npos) {
+        return "Incomplete genset declaration. After 'general Class', expected 'specifics' followed by subclasses.";
+    }
+
+    if (m.find("expecting") != std::string::npos) {
+        if (m.find("SYM_RBRACE") != std::string::npos) return "Missing closing brace '}'.";
+        if (m.find("SYM_LBRACE") != std::string::npos) return "Missing opening brace '{'.";
+        if (m.find("CLASS_ID") != std::string::npos) return "Expected a Class or Type identifier.";
+        if (m.find("RELATION_ID") != std::string::npos) return "Expected an attribute name (lowercase).";
+        if (m.find("META_ATTRIBUTE") != std::string::npos) return "Malformed meta-attribute { ... }.";
+        if (m.find("SYM_COLON") != std::string::npos) return "Missing ':' to separate name and type.";
+    }
+
+    return "Syntax error. Check the structure near this token.";
 }
 
 int yyerror(AST* ast, const char *s) {
