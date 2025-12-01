@@ -194,22 +194,19 @@ void AST::print_summary() {
             std::cout << "\n";
         }
 
-        if (!gensets.empty()) {
+        if (!gensets.empty()) 
             std::cout << "Gensets\n";
-            
-            for (Genset* genset : gensets) {
-                std::cout << "Genset: " << genset->getName() << '\n';
 
-                std::cout << "Mother class: " << genset->getMotherClass() << '\n';
+        for (Genset* genset : gensets) {
+            std::cout << "Genset: " << genset->getName() << '\n';
 
-                if (!genset->getSpecificClass().empty()) {
-                    std::cout << "Specific classes:\n";
-                    for (auto& cls : genset->getSpecificClass()) std::cout << "- " << cls << '\n';
-                    std::cout << "\n";
-                }
+            std::cout << "Mother class: " << genset->getMotherClass() << '\n';
+
+            if (!genset->getSpecificClass().empty()) {
+                std::cout << "Specific classes:\n";
+                for (auto& cls : genset->getSpecificClass()) std::cout << "- " << cls << '\n';
+                std::cout << "\n";
             }
-
-            std::cout << "\n";
         }
     }
 }
