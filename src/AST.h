@@ -1,17 +1,20 @@
 #pragma once
+#include "SymbolTable.h"
 #include <list>
 #include <string>
 
-class Node {      
+class Node {
     std::string name;
     std::list<Node*> children;
 
 public:
     Node(std::string name) : name(name) { }
 
-    void add_child(Node* node) {
-        children.push_back(node);
-    }
+    virtual ~Node() = default;
+
+    void add_child(Node* node) { children.push_back(node); }
+    const std::string& getName() const { return name; }
+    std::list<Node*>& getChildren() { return children; }
 };
 
 class Package : public Node {
@@ -33,12 +36,17 @@ public:
 
 class Relation : public Node {
     bool is_internal;
-    std::string related_class;
+    std::string domain_class, image_class;
 
 public:
-    Relation(std::string related_class) : Node(""), is_internal(true), related_class(related_class) { }
+    Relation(std::string image_class) : Node(""), is_internal(true), image_class(image_class) { }
 
-    Relation(std::string name, std::string related_class) : Node(name), is_internal(false), related_class(related_class) { }
+    Relation(std::string domain_class, std::string image_class) : 
+        Node(""), is_internal(false), domain_class(domain_class), image_class(image_class) 
+    { }
+
+    const std::string& getDomain() const { return domain_class; }
+    const std::string& getImage()  const { return image_class; }
 };
 
 class Type : public Node {
@@ -70,8 +78,13 @@ public:
 
 class AST {
     Node root = Node("root");
+    SymbolTable& symbol_table;
+
+    void link_relations();
 
 public:
+    AST(SymbolTable& symbol_table) : symbol_table(symbol_table) { }
+
     Node* add_package(std::string name);
     Node* add_class(Package* package, std::string name);
     Node* add_attribute(Node* node, std::string name, std::string type);
@@ -81,4 +94,6 @@ public:
     Node* add_enum(Package* package, std::string name);
     Node* add_instance(Enum* enumeration, std::string name);
     Node* add_genset(Package* package, std::string name);
+
+    void print_summary();
 };
