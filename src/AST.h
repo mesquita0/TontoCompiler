@@ -12,6 +12,7 @@ public:
 
     virtual ~Node() = default;
 
+    void setName(const std::string& name) { this->name = name; }
     void add_child(Node* node) { children.push_back(node); }
     const std::string& getName() const { return name; }
     std::list<Node*>& getChildren() { return children; }
@@ -32,6 +33,8 @@ class Attribute : public Node {
 
 public:
     Attribute(std::string name, std::string data_type) : Node(name), data_type(data_type) { }
+
+    const std::string& getDataType() const { return data_type; }
 };
 
 class Relation : public Node {
@@ -47,6 +50,8 @@ public:
 
     const std::string& getDomain() const { return domain_class; }
     const std::string& getImage()  const { return image_class; }
+
+    bool isInternal() const { return is_internal; }  
 };
 
 class Type : public Node {
@@ -72,8 +77,10 @@ public:
     Genset(std::string name, std::string mother_class) : Node(name), mother_class(mother_class) { }
 
     void setMotherClass(std::string mother_class) { this->mother_class = mother_class; }
-
     void addClass(std::string gen_class) { this->classes.push_back(gen_class); }
+
+    const std::string& getMotherClass() const { return mother_class; }
+    const std::list<std::string>& getSpecificClass() const { return classes; }
 };
 
 class AST {

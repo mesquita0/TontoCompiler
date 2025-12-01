@@ -10,4 +10,6 @@ int main() {
 	AST ast = AST(symbol_table);
 
 	yyparse(&ast);
+
+	ast.print_summary();
 }
