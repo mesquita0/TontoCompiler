@@ -4,6 +4,8 @@
 %code requires {
     #include "AST.h"
     #include "token.h"
+
+    class Scanner;
 }
 
 %{
@@ -28,11 +30,13 @@ extern int yycolumn;
 extern std::string error_token;
 
 extern Token yylval;
-extern int yylex();
-extern int yyerror(AST* ast, const char *s);
+extern int yylex(Scanner& scanner);
+extern int yyerror(AST* ast, Scanner& scanner, const char *s);
 %}
 
 %parse-param { AST* ast }
+%parse-param { Scanner& scanner }
+%lex-param   { Scanner& scanner }
 
 // Keywords
 %token KW_GENSET
@@ -339,9 +343,7 @@ ex_relation_decl:
 
 %%
 
-int yylex() {
-    static Scanner scanner;
-
+int yylex(Scanner& scanner) {
     yylval = scanner.scan();
     yylineno = yylval.LineNum();
     yycolumn = yylval.ColumnNum();
@@ -417,7 +419,7 @@ static std::string suggest_fix(const std::string& unexpected, const char* msg) {
     return "Syntax error. Check the structure near this token.";
 }
 
-int yyerror(AST* ast, const char *s) {
+int yyerror(AST* ast, Scanner& scanner, const char *s) {
     std::string suggestion = suggest_fix(error_token, s);
 
     fprintf(stderr,

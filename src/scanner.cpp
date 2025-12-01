@@ -1,8 +1,13 @@
 #include "scanner.h"
-#include <FlexLexer.h>
 #include "token.h"
 #include "parser.h"
+#include <FlexLexer.h>
+#include <fstream>
 #include <iostream>
+
+Scanner::Scanner(std::ifstream& stream) {
+    scanner.switch_streams(&stream, nullptr);
+}
 
 Token Scanner::scan() {
     TokenClass token_class = (TokenClass) scanner.yylex();
