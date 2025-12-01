@@ -119,11 +119,12 @@ declarations:
 
 // Class declaration
 class_decl:
-        CLASS_STEREOTYPE CLASS_ID specializes_decl class_body
+        CLASS_STEREOTYPE CLASS_ID
         {
             current_class = ast->add_class((Package*) current_package, $2.Lexeme());
             current_attribute_context = current_class;
         }
+        specializes_decl class_body
     ;
 
 specializes_decl:
@@ -173,11 +174,12 @@ meta_attribute:
 
 // Type declaration
 type_decl:
-        KW_DATATYPE CLASS_ID SYM_LBRACE datatype_elements SYM_RBRACE
+        KW_DATATYPE CLASS_ID 
         {
             current_type = ast->add_type((Package*) current_package, $2.Lexeme());
             current_attribute_context = current_type;
         }
+        SYM_LBRACE datatype_elements SYM_RBRACE
     ;
 
 datatype_elements:
@@ -189,10 +191,11 @@ datatype_elements:
 
 // Enum declaration
 enum_decl:
-        KW_ENUM CLASS_ID SYM_LBRACE enum_elements SYM_RBRACE
+        KW_ENUM CLASS_ID 
         {
             current_enum = ast->add_enum((Package*) current_package, $2.Lexeme());
         }
+        SYM_LBRACE enum_elements SYM_RBRACE
     ;
 
 enum_elements:
@@ -210,10 +213,11 @@ enum_element:
 
 // Genelarization declaration
 gen_decl:
-        opt_disjoint opt_complete KW_GENSET CLASS_ID gen_body
+        opt_disjoint opt_complete KW_GENSET CLASS_ID 
         {
             current_genset = (Genset*) ast->add_genset((Package*) current_package, $4.Lexeme());
         }
+        gen_body
     ;
 
 opt_disjoint:
@@ -228,7 +232,7 @@ opt_complete:
 
 gen_body:
         gen_where
-    |   SYM_LBRACKET gen_elements SYM_RBRACKET
+    |   SYM_LBRACE gen_elements SYM_RBRACE
     ;
 
 gen_elements:

@@ -5,9 +5,12 @@
 class Node;
 
 class SymbolTable {
-    std::unordered_map<std::string, Node> symbols;
+    std::unordered_map<std::string, Node*> symbols;
+    int i = 0;
 
 public:
-    Node* add(const Node& node);
+    ~SymbolTable();
+    
+    Node* add(Node* node);
     Node* get(const std::string& name);
 };
