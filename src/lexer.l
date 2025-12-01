@@ -23,7 +23,7 @@ delim        [ \t\n]
 ws           {delim}+
 class_id     [A-Z][A-Za-z_]+
 relation_id  [a-z][A-Za-z_]+
-instance_id  [A-Za-z_]+[0-9]+({delim}|$)
+instance_id  [A-Za-z_]+[0-9]+({delim}|,|$)
 custom_dt    [A-Za-z]+DataType
 integer      [0-9]+
 
