@@ -21,7 +21,7 @@ Node* current_attribute_context;
 Genset* current_genset;
 
 bool is_internal_relation;
-std::string relation_id;
+std::string related_class;
 
 int yylineno = 1;
 extern int yycolumn;
@@ -280,7 +280,7 @@ relation_body:
                 ast->add_relation((Class*) current_class, $4.Lexeme());
             }
             else {
-                ast->add_relation((Package*) current_package, relation_id, $4.Lexeme());
+                ast->add_relation((Package*) current_package, related_class, $4.Lexeme());
             }
         }
     ;
@@ -310,10 +310,10 @@ relation_connector:
 
 // External relation declaration
 ex_relation_decl:
-        SYM_AT RELATION_STEREOTYPE RELATION_ID relation_body 
+        SYM_AT RELATION_STEREOTYPE KW_RELATION CLASS_ID relation_body 
         {
             is_internal_relation = false;
-            relation_id = $3.Lexeme();
+            related_class = $4.Lexeme();
         }
     ;
 
