@@ -194,7 +194,7 @@ void AST::print_summary() {
                         instances.push_back(i->getName());
 
                 if (!instances.empty()) {
-                    std::cout << "Instances: ";
+                    std::cout << "Instances:\n";
                     for (auto& inst : instances) std::cout << inst << '\n';
                     std::cout << "\n";
                 }
