@@ -2,17 +2,22 @@
 #include "AST.h"
 #include <unordered_map>
 #include <string>
+#include <typeinfo>
 
 Node* SymbolTable::add(Node* node) {
     if (node->getName() == "")
         node->setName("unnamed" + i++);
 
-    if (symbols.contains(node->getName())) 
-        delete node;
-    else
-        symbols.emplace(node->getName(), node);
+    std::string name = node->getName();
 
-    return get(node->getName());
+    if (!symbols.contains(name))
+        symbols.emplace(name, node);
+    else {
+        if (typeid(*node) != typeid(*get(node->getName()))) return nullptr;
+        delete node;
+    }
+
+    return get(name);
 }
 
 Node* SymbolTable::get(const std::string& name) {

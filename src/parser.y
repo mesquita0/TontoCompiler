@@ -13,15 +13,15 @@
 #include <string>
 
 // Variables for ast
-Node* current_package;
-Node* current_class;
-Node* current_type;
-Node* current_enum;
-Node* current_attribute_context;
-Genset* current_genset;
+Node* current_package = nullptr;
+Node* current_class = nullptr;
+Node* current_type = nullptr;
+Node* current_enum = nullptr;
+Node* current_attribute_context = nullptr;
+Genset* current_genset = nullptr;
 
-bool is_internal_relation;
-std::string related_class;
+bool is_internal_relation = false;
+std::string related_class = "";
 
 int yylineno = 1;
 extern int yycolumn;
@@ -121,8 +121,10 @@ declarations:
 class_decl:
         CLASS_STEREOTYPE CLASS_ID
         {
-            current_class = ast->add_class((Package*) current_package, $2.Lexeme());
-            current_attribute_context = current_class;
+            if (current_package) {
+                current_class = ast->add_class((Package*) current_package, $2.Lexeme());
+                current_attribute_context = current_class;
+            }
         }
         specializes_decl class_body
     ;
@@ -151,10 +153,16 @@ class_elements:
     ;
 
 attribute_decl:
-        CLASS_ID SYM_COLON type meta_attribute
+        type_id SYM_COLON type meta_attribute
         {
-            ast->add_attribute(current_attribute_context, $1.Lexeme(), $3.Lexeme());
+            if (current_attribute_context) 
+                ast->add_attribute(current_attribute_context, $1.Lexeme(), $3.Lexeme());
         }
+    ;
+
+type_id:
+        CLASS_ID
+    |   RELATION_ID
     ;
 
 type:
@@ -176,8 +184,10 @@ meta_attribute:
 type_decl:
         KW_DATATYPE CLASS_ID 
         {
-            current_type = ast->add_type((Package*) current_package, $2.Lexeme());
-            current_attribute_context = current_type;
+            if (current_package) {
+                current_type = ast->add_type((Package*) current_package, $2.Lexeme());
+                current_attribute_context = current_type;
+            }
         }
         SYM_LBRACE datatype_elements SYM_RBRACE
     ;
@@ -193,7 +203,8 @@ datatype_elements:
 enum_decl:
         KW_ENUM CLASS_ID 
         {
-            current_enum = ast->add_enum((Package*) current_package, $2.Lexeme());
+            if (current_package)
+                current_enum = ast->add_enum((Package*) current_package, $2.Lexeme());
         }
         SYM_LBRACE enum_elements SYM_RBRACE
     ;
@@ -206,7 +217,8 @@ enum_elements:
 enum_element:
         INSTANCE_ID
         {
-            ast->add_instance((Enum*) current_enum, $1.Lexeme());
+            if (current_enum)
+                ast->add_instance((Enum*) current_enum, $1.Lexeme());
         }
     ;
 
@@ -215,7 +227,8 @@ enum_element:
 gen_decl:
         opt_disjoint opt_complete KW_GENSET CLASS_ID 
         {
-            current_genset = (Genset*) ast->add_genset((Package*) current_package, $4.Lexeme());
+            if (current_package)
+                current_genset = (Genset*) ast->add_genset((Package*) current_package, $4.Lexeme());
         }
         gen_body
     ;
@@ -243,7 +256,8 @@ gen_elements:
 gen_element:
         KW_GENERAL CLASS_ID
         {
-            current_genset->setMotherClass($2.Lexeme());
+            if (current_genset)
+                current_genset->setMotherClass($2.Lexeme());
         }
     |   KW_SPECIFICS class_list
     ;
@@ -251,7 +265,8 @@ gen_element:
 gen_where:
         KW_WHERE class_list KW_SPECIALIZES CLASS_ID
          {
-            current_genset->setMotherClass($4.Lexeme());
+            if (current_genset)
+                current_genset->setMotherClass($4.Lexeme());
         }
     |
     ;
@@ -264,7 +279,8 @@ class_list:
 class_name:
         CLASS_ID
         {
-            current_genset->addClass($1.Lexeme());
+            if (current_genset)
+                current_genset->addClass($1.Lexeme());
         }
     ;
 
@@ -280,10 +296,10 @@ in_relation_decl:
 relation_body:
         cardinality relation_connector cardinality CLASS_ID
         {
-            if (is_internal_relation) {
+            if (is_internal_relation && current_class) {
                 ast->add_relation((Class*) current_class, $4.Lexeme());
             }
-            else {
+            else if (!is_internal_relation && current_package) {
                 ast->add_relation((Package*) current_package, related_class, $4.Lexeme());
             }
         }

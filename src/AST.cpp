@@ -7,63 +7,72 @@
 
 Node* AST::add_package(std::string name) {
     Node* new_node = symbol_table.add(new Package(name));
-    root.add_child(new_node);
+    if (new_node)
+        root.add_child(new_node);
 
     return new_node;
 }
 
 Node* AST::add_class(Package* package, std::string name) {
     Node* new_node = symbol_table.add(new Class(name));
-    package->add_child(new_node);
+    if (new_node)
+        package->add_child(new_node);
 
     return new_node;
 }
 
 Node* AST::add_attribute(Node* node, std::string name, std::string type) {
     Node* new_node = symbol_table.add(new Attribute(name, type));
-    node->add_child(new_node);
+    if (new_node)
+        node->add_child(new_node);
 
     return new_node;
 }
 
 Node* AST::add_relation(Class* src_class, std::string related_class) {
     Node* new_node = symbol_table.add(new Relation(related_class));
-    src_class->add_child(new_node);
+    if (new_node)
+        src_class->add_child(new_node);
 
     return new_node;
 }
 
 Node* AST::add_relation(Package* package, std::string domain, std::string image) {
     Node* new_node = symbol_table.add(new Relation(domain, image));
-    package->add_child(new_node);
+    if (new_node)
+        package->add_child(new_node);
 
     return new_node;
 }
 
 Node* AST::add_type(Package* package, std::string name) {
     Node* new_node = symbol_table.add(new Type(name));
-    package->add_child(new_node);
+    if (new_node)
+        package->add_child(new_node);
 
     return new_node;
 }
 
 Node* AST::add_enum(Package* package, std::string name) {
     Node* new_node = symbol_table.add(new Enum(name));
-    package->add_child(new_node);
+    if (new_node)
+        package->add_child(new_node);
 
     return new_node;
 }
 
 Node* AST::add_instance(Enum* enumeration, std::string name) {
     Node* new_node = symbol_table.add(new Instance(name));
-    enumeration->add_child(new_node);
+    if (new_node)
+        enumeration->add_child(new_node);
 
     return new_node;
 }
 
 Node* AST::add_genset(Package* package, std::string name) {
     Node* new_node = symbol_table.add(new Genset(name, ""));
-    package->add_child(new_node);
+    if (new_node)
+        package->add_child(new_node);
 
     return new_node;
 }
@@ -124,7 +133,7 @@ void AST::print_summary() {
                 std::cout << "Class: " << cls->getName() << '\n';
 
                 std::vector<std::string> attributes, relations;
-
+                
                 for (Node* elem : cls->getChildren())
                 {
                     if (auto a = dynamic_cast<Attribute*>(elem))
@@ -134,7 +143,7 @@ void AST::print_summary() {
                 }
 
                 if (!attributes.empty()) {
-                    std::cout << "Attributes: ";
+                    std::cout << "Attributes:\n";
                     for (auto& att : attributes) std::cout << att << '\n';
                 }
 
