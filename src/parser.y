@@ -22,7 +22,6 @@ Node* current_enum = nullptr;
 Node* current_attribute_context = nullptr;
 Genset* current_genset = nullptr;
 
-bool is_internal_relation = false;
 std::string related_class = "";
 
 int yylineno = 1;
@@ -293,19 +292,15 @@ class_name:
 in_relation_decl:
         SYM_AT RELATION_STEREOTYPE relation_body
         {
-            is_internal_relation = true;
+            if (current_class)
+                ast->add_relation((Class*) current_class, related_class);
         }
     ;
 
 relation_body:
         cardinality relation_connector cardinality CLASS_ID
         {
-            if (is_internal_relation && current_class) {
-                ast->add_relation((Class*) current_class, $4.Lexeme());
-            }
-            else if (!is_internal_relation && current_package) {
-                ast->add_relation((Package*) current_package, related_class, $4.Lexeme());
-            }
+            related_class = $4.Lexeme();
         }
     ;
 
@@ -334,10 +329,10 @@ relation_connector:
 
 // External relation declaration
 ex_relation_decl:
-        SYM_AT RELATION_STEREOTYPE KW_RELATION CLASS_ID relation_body 
+        SYM_AT RELATION_STEREOTYPE KW_RELATION CLASS_ID relation_body
         {
-            is_internal_relation = false;
-            related_class = $4.Lexeme();
+            if (current_package) 
+                ast->add_relation((Package*) current_package, $4.Lexeme(), related_class);
         }
     ;
 

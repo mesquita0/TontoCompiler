@@ -21,6 +21,9 @@ Node* SymbolTable::add(Node* node) {
 }
 
 Node* SymbolTable::get(const std::string& name) {
+    if (!symbols.contains(name))
+        return nullptr;
+
     return symbols.at(name);
 }
 

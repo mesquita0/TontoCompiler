@@ -81,7 +81,7 @@ void AST::link_relations() {
     for (Node* package : root.getChildren()) {
         std::list<Node*>& nodes = package->getChildren();
         auto it = nodes.begin();
-
+        
         while (it != nodes.end()) {
             Relation* external_relation = dynamic_cast<Relation*>(*it);
             if (!external_relation) {
@@ -89,10 +89,15 @@ void AST::link_relations() {
                 continue;
             }
 
-            Node* domain_class = symbol_table.get(external_relation->getDomain());
-            domain_class->add_child(external_relation);
-
-            it = nodes.erase(it);
+            Node* domain_class  = symbol_table.get(external_relation->getDomain());
+            if (!domain_class) {
+                std::cout << "Error: No symbol '" << external_relation->getDomain() << "'.\n";
+                it++;
+            }
+            else {
+                domain_class->add_child(external_relation);
+                it = nodes.erase(it);
+            }
         }
     }
 }
