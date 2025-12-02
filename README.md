@@ -52,8 +52,8 @@ Configura o parser, inicia a análise e exibe os relatórios finais.
  ``cmake --build "./out/build/GCC 13.3.0 x86_64-linux-gnu"``
 
  ## - Como Executar: 
- - O analisador lê até dois arquivos .tonto ou texto da entrada padrão (stdin);
- - Comando para executar o projeto: ``"./out/build/GCC 13.3.0 x86_64-linux-gnu/src/TontoCompiler" < test.tonto``
+ - O analisador lê arquivos .tonto;
+ - Comando para executar o projeto: ``"./out/build/GCC 13.3.0 x86_64-linux-gnu/src/TontoCompiler" test.tonto``
  
 
 
