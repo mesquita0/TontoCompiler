@@ -1,5 +1,6 @@
 ﻿#include "AST.h"
 #include "SymbolTable.h"
+#include "SemanticAnalyzer.h"
 #include "parser.h"
 #include "scanner.h"
 #include <iostream>
@@ -33,5 +34,6 @@ int main(int argc, char** argv) {
         yyparse(&ast, scanner);
     }
 
-	ast.print_summary();
+	SemanticAnalyzer semantic_analizer(ast, symbol_table);
+    semantic_analizer.analyze();
 }
