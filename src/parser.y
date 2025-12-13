@@ -24,6 +24,9 @@ Genset* current_genset = nullptr;
 
 std::string related_class = "";
 
+bool genset_disjoint = false;
+bool genset_complete = false;
+
 int yylineno = 1;
 extern int yycolumn;
 extern std::string error_token;
@@ -125,7 +128,7 @@ class_decl:
         CLASS_STEREOTYPE CLASS_ID
         {
             if (current_package) {
-                current_class = ast->add_class((Package*) current_package, $2.Lexeme());
+                current_class = ast->add_class((Package*) current_package, $1.Lexeme(), $2.Lexeme());
                 current_attribute_context = current_class;
             }
         }
@@ -138,9 +141,16 @@ specializes_decl:
     ;
 
 classes:
-        CLASS_ID SYM_COMMA classes
-    |   CLASS_ID
+        super_class_name SYM_COMMA classes
+    |   super_class_name
     ;
+
+super_class_name:
+        CLASS_ID
+    {
+        if (current_class)
+            ((Class*) current_class)->addSuperClass($1.Lexeme());
+    }
 
 class_body:
         SYM_LBRACE class_elements SYM_RBRACE
@@ -230,20 +240,23 @@ enum_element:
 gen_decl:
         opt_disjoint opt_complete KW_GENSET CLASS_ID 
         {
-            if (current_package)
+            if (current_package) {
                 current_genset = (Genset*) ast->add_genset((Package*) current_package, $4.Lexeme());
+                if (genset_disjoint) current_genset->setDisjoint();
+                if (genset_complete) current_genset->setComplete();
+            }
         }
         gen_body
     ;
 
 opt_disjoint:
-        KW_DISJOINT
-    |
+        KW_DISJOINT { genset_disjoint = true; }
+    |   { genset_disjoint = false; }
     ;
 
 opt_complete:
-        KW_COMPLETE
-    |
+        KW_COMPLETE { genset_complete = true; }
+    |   { genset_complete = false; }
     ;
 
 gen_body:
@@ -293,7 +306,7 @@ in_relation_decl:
         SYM_AT RELATION_STEREOTYPE relation_body
         {
             if (current_class)
-                ast->add_relation((Class*) current_class, related_class);
+                ast->add_relation((Class*) current_class, $2.Lexeme(), related_class);
         }
     ;
 
@@ -332,7 +345,7 @@ ex_relation_decl:
         SYM_AT RELATION_STEREOTYPE KW_RELATION CLASS_ID relation_body
         {
             if (current_package) 
-                ast->add_relation((Package*) current_package, $4.Lexeme(), related_class);
+                ast->add_relation((Package*) current_package, $2.Lexeme(), $4.Lexeme(), related_class);
         }
     ;
 

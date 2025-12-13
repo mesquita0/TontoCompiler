@@ -13,8 +13,8 @@ Node* AST::add_package(std::string name) {
     return new_node;
 }
 
-Node* AST::add_class(Package* package, std::string name) {
-    Node* new_node = symbol_table.add(new Class(name));
+Node* AST::add_class(Package* package, std::string stereotype, std::string name) {
+    Node* new_node = symbol_table.add(new Class(stereotype, name));
     if (new_node)
         package->add_child(new_node);
 
@@ -29,16 +29,16 @@ Node* AST::add_attribute(Node* node, std::string name, std::string type) {
     return new_node;
 }
 
-Node* AST::add_relation(Class* src_class, std::string related_class) {
-    Node* new_node = symbol_table.add(new Relation(related_class));
+Node* AST::add_relation(Class* src_class, std::string stereotype, std::string related_class) {
+    Node* new_node = symbol_table.add(new Relation(stereotype, related_class));
     if (new_node)
         src_class->add_child(new_node);
 
     return new_node;
 }
 
-Node* AST::add_relation(Package* package, std::string domain, std::string image) {
-    Node* new_node = symbol_table.add(new Relation(domain, image));
+Node* AST::add_relation(Package* package, std::string stereotype, std::string domain, std::string image) {
+    Node* new_node = symbol_table.add(new Relation(stereotype, domain, image));
     if (new_node)
         package->add_child(new_node);
 
@@ -102,8 +102,12 @@ void AST::link_relations() {
     }
 }
 
-void AST::print_summary() {
+void AST::consolidate() {
     link_relations();
+}
+
+void AST::print_summary() {
+    consolidate();
 
     std::cout << "Synthesis Table\n\n";
 

@@ -24,8 +24,16 @@ public:
 };
 
 class Class : public Node {
+    std::string stereotype;
+    std::list<std::string> super_classes;
+
 public:
-    Class(std::string name) : Node(name) { }
+    Class(std::string stereotype, std::string name) : Node(name), stereotype(stereotype) { }
+
+    void addSuperClass(const std::string& sc) { super_classes.push_back(sc); }
+
+    const std::string& getStereotype() const { return stereotype; }
+    const std::list<std::string>& getSuperClasses() const { return super_classes; }
 };
 
 class Attribute : public Node {
@@ -39,15 +47,19 @@ public:
 
 class Relation : public Node {
     bool is_internal;
+    std::string stereotype;
     std::string domain_class, image_class;
 
 public:
-    Relation(std::string image_class) : Node(""), is_internal(true), image_class(image_class) { }
-
-    Relation(std::string domain_class, std::string image_class) : 
-        Node(""), is_internal(false), domain_class(domain_class), image_class(image_class) 
+    Relation(std::string stereotype, std::string image_class) 
+        : Node(""), is_internal(true), stereotype(stereotype), image_class(image_class) 
     { }
 
+    Relation(std::string stereotype, std::string domain_class, std::string image_class)
+        : Node(""), is_internal(false), stereotype(stereotype), domain_class(domain_class), image_class(image_class) 
+    { }
+
+    const std::string& getStereotype() const { return stereotype; }
     const std::string& getDomain() const { return domain_class; }
     const std::string& getImage()  const { return image_class; }
 
@@ -72,6 +84,7 @@ public:
 class Genset : public Node {
     std::string mother_class;
     std::list<std::string> classes;
+    bool disjoint = false, complete = false;
 
 public:
     Genset(std::string name, std::string mother_class) : Node(name), mother_class(mother_class) { }
@@ -81,6 +94,12 @@ public:
 
     const std::string& getMotherClass() const { return mother_class; }
     const std::list<std::string>& getSpecificClass() const { return classes; }
+
+    void setDisjoint() { disjoint = true; }
+    void setComplete() { complete = true; }
+
+    bool isDisjoint() const { return disjoint; }
+    bool isComplete() const { return complete; }
 };
 
 class AST {
@@ -93,14 +112,15 @@ public:
     AST(SymbolTable& symbol_table) : symbol_table(symbol_table) { }
 
     Node* add_package(std::string name);
-    Node* add_class(Package* package, std::string name);
+    Node* add_class(Package* package, std::string stereotype, std::string name);
     Node* add_attribute(Node* node, std::string name, std::string type);
-    Node* add_relation(Class* src_class, std::string related_class); // internal relation
-    Node* add_relation(Package* package, std::string name, std::string related_class); // external relation
+    Node* add_relation(Class* src_class, std::string stereotype, std::string related_class); // internal relation
+    Node* add_relation(Package* package, std::string stereotype, std::string name, std::string related_class); // external relation
     Node* add_type(Package* package, std::string name);
     Node* add_enum(Package* package, std::string name);
     Node* add_instance(Enum* enumeration, std::string name);
     Node* add_genset(Package* package, std::string name);
 
+    void consolidate();
     void print_summary();
 };
