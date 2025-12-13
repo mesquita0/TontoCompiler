@@ -75,6 +75,7 @@ role                  return CLASS_STEREOTYPE;
 historicalRole        return CLASS_STEREOTYPE;
 powertype             return CLASS_STEREOTYPE;
 relator               return CLASS_STEREOTYPE;
+mode                  return CLASS_STEREOTYPE;
 
 material              return RELATION_STEREOTYPE;
 derivation            return RELATION_STEREOTYPE;
