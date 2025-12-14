@@ -13,4 +13,10 @@ public:
     
     Node* add(Node* node);
     Node* get(const std::string& name);
+
+    auto begin() { return symbols.begin(); }
+    auto end()   { return symbols.end(); }
+
+    auto begin() const { return symbols.begin(); }
+    auto end()   const { return symbols.end(); }
 };
