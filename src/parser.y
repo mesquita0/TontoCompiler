@@ -311,10 +311,15 @@ in_relation_decl:
     ;
 
 relation_body:
-        cardinality relation_connector cardinality CLASS_ID
+        cardinality relation_connector opt_relation_name cardinality CLASS_ID
         {
-            related_class = $4.Lexeme();
+            related_class = $5.Lexeme();
         }
+    ;
+
+opt_relation_name:
+        RELATION_ID relation_connector
+    |
     ;
 
 cardinality:
