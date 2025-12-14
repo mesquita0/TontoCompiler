@@ -1,0 +1,11 @@
+package Role_Pattern
+
+kind ClassName
+
+role Role_Name_One specializes ClassName
+role Role_Name_Two specializes ClassName
+
+complete genset Class_Role_Genset_Name {
+    general ClassName
+    specifics Role_Name_One, Role_Name_Two
+}

@@ -1,0 +1,14 @@
+package RoleMixin_Pattern
+
+kind ClassNameOne
+kind ClassNameTwo
+
+roleMixin RoleMixin_Name
+
+role Role_Name_One specializes ClassNameOne, RoleMixin_Name
+role Role_Name_Two specializes ClassNameTwo, RoleMixin_Name
+
+disjoint complete genset RoleMixin_Genset_Name {
+    general RoleMixin_Name
+    specifics Role_Name_One, Role_Name_Two
+}
