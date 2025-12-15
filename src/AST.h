@@ -7,7 +7,7 @@ class Node {
     std::string name;
     std::list<Node*> children;
    
-    protected:
+protected:
     int line; 
 
 public:

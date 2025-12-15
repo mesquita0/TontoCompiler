@@ -2,9 +2,11 @@
 #include "AST.h"
 #include "SymbolTable.h"
 #include <iostream>
+#include <list>
 #include <utility>
 #include <string>
-#include <list>
+#include <vector>
+#include <algorithm>
 
 enum Pattern { 
     Subkind, Role, Phase, Relator, Mode, RoleMixin 
@@ -16,21 +18,12 @@ enum class Stereotype {
     Relator, Mode, Invalid
 };
 
-Stereotype getStereotypeEnum(const std::string& s) {
-    if (s == "kind") return Stereotype::Kind;
-    if (s == "subkind") return Stereotype::Subkind;
-    if (s == "phase") return Stereotype::Phase;
-    if (s == "role") return Stereotype::Role;
-    if (s == "category") return Stereotype::Category;
-    if (s == "roleMixin") return Stereotype::RoleMixin;
-    if (s == "mixin") return Stereotype::Mixin;
-    if (s == "relator") return Stereotype::Relator;
-    if (s == "mode") return Stereotype::Mode;
-    return Stereotype::Invalid;
-}
+static std::vector<std::pair<int, std::string>>patternResults;
 
-std::pair<bool, bool> checkGenset(Genset* genset, const std::string& stereotype, SymbolTable& st);
+void printAllPatternResults();
 void printResult(Pattern pattern, Node* node);
+Stereotype getStereotypeEnum(const std::string& s);
+std::pair<bool, bool> checkGenset(Genset* genset, const std::string& stereotype, SymbolTable& st);
 
 void SemanticAnalyzer::analyze() {
     ast.consolidate();
@@ -52,6 +45,8 @@ void SemanticAnalyzer::analyze() {
             checkMode(cls);
         }
     }
+
+    printAllPatternResults();
 }
 
 bool SemanticAnalyzer::checkReferences() {
@@ -357,9 +352,22 @@ std::pair<bool, bool> checkGenset(Genset* genset, const std::string& stereotype,
     return { all_equal, valid };
 }
 
+Stereotype getStereotypeEnum(const std::string& s) {
+    if (s == "kind") return Stereotype::Kind;
+    if (s == "subkind") return Stereotype::Subkind;
+    if (s == "phase") return Stereotype::Phase;
+    if (s == "role") return Stereotype::Role;
+    if (s == "category") return Stereotype::Category;
+    if (s == "roleMixin") return Stereotype::RoleMixin;
+    if (s == "mixin") return Stereotype::Mixin;
+    if (s == "relator") return Stereotype::Relator;
+    if (s == "mode") return Stereotype::Mode;
+    return Stereotype::Invalid;
+}
+
 void printResult(Pattern pattern, Node* node) {
     
-   std::string patternName;
+    std::string patternName;
     std::string details = "";
 
     switch (pattern) {
@@ -415,9 +423,24 @@ void printResult(Pattern pattern, Node* node) {
             break;
     }
 
-    std::cout << "[Line " << node->getLine() << "] Pattern Identified: " << patternName << "\n"
-              << "Element: " << node->getName()
-              << details 
-              << "\n" 
-              << std::endl;
+    std::string message =
+        "[Line " + std::to_string(node->getLine()) + "] Pattern Identified: " +
+        patternName + "\n" +
+        "Element: " + node->getName() +
+        details + "\n";
+
+    patternResults.push_back({ node->getLine(), message });
+}
+
+void printAllPatternResults() {
+    std::sort(patternResults.begin(), patternResults.end(),
+        [](const std::pair<int, std::string>& a, const std::pair<int, std::string>& b) {
+            return a.first < b.first;
+        });
+
+    for (const auto& result : patternResults) {
+        std::cout << result.second << std::endl;
+    }
+
+    patternResults.clear();
 }
