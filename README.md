@@ -81,7 +81,7 @@ cmake --build build
 
 Abaixo está o resultado real da execução do analisador sobre o arquivo de teste `tests/relator.tonto`:
 
-```text
+`
 ===================================================
  ARQUIVO: tests/relator.tonto
 
@@ -90,7 +90,7 @@ Element: Relator_Name
 Relations: (mediation -> Role_Name1), (mediation -> Role_Name2)
 
 ===================================================
-
+`
 
 ## - Autores:
 - João Pedro Souza Cavalcante;
