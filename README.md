@@ -65,13 +65,15 @@ Para compilar e rodar, você precisará das seguintes ferramentas (Linux/WSL):
 
 ## - Como Compilar:
 -O projeto utiliza **CMake**. Para compilar, execute o seguinte comando na raiz do projeto:
-```cmake --build "./out/build/GCC 13.3.0 x86_64-linux-gnu"
+```bash
+cmake --build "./out/build/GCC 13.3.0 x86_64-linux-gnu"
 ```
 
 
  ## - Como Executar: 
  - O analisador lê arquivos .tonto. Para executar, execute o seguinte comando na raiz do projeto:
- ```"./out/build/GCC 13.3.0 x86_64-linux-gnu/src/TontoCompiler" nome_do_arquivo.tonto
+ ```bash
+"./out/build/GCC 13.3.0 x86_64-linux-gnu/src/TontoCompiler" nome_do_arquivo.tonto
 ```
 
 ## 📄 Exemplo de Saída
