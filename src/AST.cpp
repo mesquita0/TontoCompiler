@@ -5,6 +5,12 @@
 #include <string>
 #include <vector>
 
+extern int yylineno;
+
+Node::Node(std::string name) : name(name) {
+    this->line = yylineno; 
+}
+
 Node* AST::add_package(std::string name) {
     Node* new_node = symbol_table.add(new Package(name));
     if (new_node)
