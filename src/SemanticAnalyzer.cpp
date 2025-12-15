@@ -381,7 +381,6 @@ void printResult(Pattern pattern, Node* node) {
             else if (pattern == Phase) patternName = "Phase";
             else patternName = "RoleMixin";
 
-       
             if (auto* genset = dynamic_cast<Genset*>(node)) {
                 details += "\nGeneral: " + genset->getMotherClass();
                 details += "\nSpecifics: [";
@@ -424,10 +423,8 @@ void printResult(Pattern pattern, Node* node) {
     }
 
     std::string message =
-        "[Line " + std::to_string(node->getLine()) + "] Pattern Identified: " +
-        patternName + "\n" +
-        "Element: " + node->getName() +
-        details + "\n";
+        "[Line " + std::to_string(node->getLine()) + "] Pattern Identified: " + patternName + "\n" +
+        "Element: " + node->getName() + details + "\n";
 
     patternResults.push_back({ node->getLine(), message });
 }
