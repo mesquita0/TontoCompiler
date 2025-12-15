@@ -4,6 +4,7 @@
 #include <iostream>
 #include <utility>
 #include <string>
+#include <list>
 
 enum Pattern { 
     Subkind, Role, Phase, Relator, Mode, RoleMixin 
@@ -357,5 +358,70 @@ std::pair<bool, bool> checkGenset(Genset* genset, const std::string& stereotype,
 }
 
 void printResult(Pattern pattern, Node* node) {
+    
+    std::string patternName;
+    std::string details = "";
 
+    switch (pattern) {
+
+        case Subkind:
+        case Role:
+        case Phase:
+        case RoleMixin: 
+        {
+            if (pattern == Subkind) patternName = "Subkind";
+            else if (pattern == Role) patternName = "Role";
+            else if (pattern == Phase) patternName = "Phase";
+            else patternName = "RoleMixin";
+
+            if (auto* genset = dynamic_cast<Genset*>(node)) {
+             
+                details += "\nGeneral: " + genset->getMotherClass();
+                
+                details += "\nSpecifics: [";
+                
+                auto specifics = genset->getSpecificClass(); 
+                bool first = true;
+                for (const auto& spec : specifics) {
+                    if (!first) details += ", ";
+                    details += spec;
+                    first = false;
+                }
+                
+                details += "]";
+            }
+            break;
+        }
+
+        case Relator:
+        case Mode:
+        {
+            patternName = (pattern == Relator) ? "Relator" : "Mode";
+
+       
+            if (auto* cls = dynamic_cast<Class*>(node)) {
+                details += "\nRelations: ";
+                bool first = true;
+                
+                for (auto& child : cls->getChildren()) {
+                    if (auto* relation = dynamic_cast<Relation*>(child)) {
+                        if (!first) details += ", ";
+                        details += "(" + relation->getStereotype() + " -> " + relation->getImage() + ")";
+                        first = false;
+                    }
+                }
+            }
+            break;
+        }
+
+        default: 
+            patternName = "Unknown"; 
+            break;
+    }
+
+    std::cout << "Pattern Identified: " << patternName << "\n"
+              << "Element: " << node->getName()
+              << details  
+              << "\n"     
+              << std::endl;
 }
