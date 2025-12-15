@@ -1,26 +1,32 @@
 # TontoCompiler
 
-### Analisador Sntático para a Linguagem **TONTO** (Textual Ontology Language)
+### Analisador Sintático e Semântico para a Linguagem **TONTO** (Textual Ontology Language)
 
 ---
 ## - Descrição do Projeto
-Este projeto consiste em um analisador sintático desenvolvido em **C++**, utilizando as ferramentas **Flex** (para análise léxica) e **Bison** (para análise sintática). O objetivo é validar a estrutura gramatical de arquivos escritos na linguagem **TONTO (Textual Ontology Language)** 
+Este projeto consiste em um compilador desenvolvido em **C++**, utilizando as ferramentas **Flex** (para análise léxica) e **Bison** (para análise sintática). O objetivo é validar a estrutura gramatical e lógica de arquivos escritos na linguagem **TONTO**.
 
-**TONTO** é uma linguagem textual declarativa para especificação de **ontologias computacionais** baseadas em OntoUML, permitindo a definição de classes, relações, generalizações e outros construtos ontológicos
+**TONTO** é uma linguagem textual declarativa para especificação de **ontologias computacionais** baseadas em OntoUML, permitindo a definição de classes, relações, generalizações e outros construtos ontológicos.
 
 Este projeto foi desenvolvido como parte da disciplina **Compiladores** da **Universidade Federal Rural do Semi-Árido (UFERSA)**, sob orientação do professor **Pátricio de Alencar Silva**.
 ---
 
 ## - Objetivo
-Implementar um **analisador sintático** capaz de:
-- **Validar a estrutura** de especificações TONTO (Pacotes, Classes, Relações, Enums, Gensets)
-- **Recuperação de Erros:** Identificar erros sintáticos e continuar a análise sem abortar o programa
-- **Sugestão de Correção:** Fornecer mensagens de erro amigáveis com sugestões práticas para o usuário
-- Gerar uma **tabela de síntese** mostrando a contagem de cada tipo de token reconhecido (quantidade de classes, pacotes, enums, etc).
+1.  **Análise Léxica e Sintática:**
+    * Validar a estrutura de especificações TONTO (Pacotes, Classes, Relações, Enums, Gensets).
+    * **Recuperação de Erros:** Identificar erros sintáticos e continuar a análise sem abortar o programa (Panic Mode).
+    * **Sugestão de Correção:** Fornecer mensagens de erro amigáveis com sugestões práticas.
+
+2.  **Análise Semântica**
+    * Identificação de **Padrões de Projeto de Ontologias (ODPs)**.
+    * Aplicação de **Coerção** para correção automática de erros leves.
+    * **Dedução** de estruturas implícitas (Overloading).
 
 ---
 
 ## - Funcionalidades Suportadas
+
+### 1. Estruturas da Linguagem (Sintaxe)
 O analisador verifica a corretude dos seguintes construtos da linguagem:
 1.  **Pacotes:** Namespaces que agrupam os elementos da ontologia.
 2.  **Classes:** Definições com estereótipos (ex: `kind`, `role`, `phase`) e atributos tipados.
@@ -29,32 +35,61 @@ O analisador verifica a corretude dos seguintes construtos da linguagem:
 5.  **Generalizações (Gensets):** Estruturas de herança (`general`/`specifics`) com restrições de `disjoint` e `complete`.
 6.  **Relações:** Declarações de relacionamentos internos e externos com cardinalidades e estereótipos (ex: `@mediation`, `@material`).
 
-## - Principais Componentes
+### 2. Validação Semântica e Padrões (ODPs)
+O analisador identifica e valida semanticamente os seguintes padrões estruturais:
+* **Subkind Pattern**
+* **Role Pattern**
+* **Phase Pattern**
+* **Relator Pattern**
+* **Mode Pattern**
+* **RoleMixin Pattern**
 
-### `parser.y` (Bison)
-Arquivo do Bison com a gramática e lógica de tratamento de erros.
+## - Estrutura do Projeto
 
-### `lexer.l` (Flex)
-Define as regras léxicas e expressões regulares para reconhecer os tokens da linguagem.
+* `src/`: Código fonte C++ (`main.cpp`, `SemanticAnalyzer.cpp`, `AST.cpp`), Lexer (`lexer.l`) e Parser (`parser.y`).
+* `tests/`: Arquivos de exemplo `.tonto` cobrindo todos os padrões e casos de teste.
+* `CMakeLists.txt`: Configuração de build do projeto.
 
 ---
-###  `AST.h` e `AST.cpp`
-Implementação da Árvore Sintática Abstrata e tabelas de símbolos.
----
 
-###  `main.cpp`
-Configura o parser, inicia a análise e exibe os relatórios finais.
+## - Pré-requisitos
+
+Para compilar e rodar, você precisará das seguintes ferramentas (Linux/WSL):
+
+* **C++ Compiler** (g++)
+* **CMake** (versão 3.10+)
+* **Flex**
+* **Bison**
 
 ---
 
 ## - Como Compilar:
- -O projeto utiliza **CMake**. Para compilar, execute o seguinte comando na raiz do projeto:
- ``cmake --build "./out/build/GCC 13.3.0 x86_64-linux-gnu"``
+-O projeto utiliza **CMake**. Para compilar, execute o seguinte comando na raiz do projeto:
+# 1. Gere os arquivos de configuração na pasta 'build'
+cmake -S . -B build
+# 2. Compile o executável
+cmake --build build
+
 
  ## - Como Executar: 
  - O analisador lê arquivos .tonto;
- - Comando para executar o projeto: ``"./out/build/GCC 13.3.0 x86_64-linux-gnu/src/TontoCompiler" test.tonto``
+ #  Comando para executar o projeto: 
+ ./build/src/TontoCompiler tests/nome_do_arquivo.tonto
  
+
+## 📄 Exemplo de Saída
+
+Abaixo está o resultado real da execução do analisador sobre o arquivo de teste `tests/relator.tonto`:
+
+```text
+===================================================
+ ARQUIVO: tests/relator.tonto
+
+Pattern Identified: Relator
+Element: Relator_Name
+Relations: (mediation -> Role_Name1), (mediation -> Role_Name2)
+
+===================================================
 
 
 ## - Autores:
