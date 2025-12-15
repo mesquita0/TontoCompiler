@@ -359,11 +359,10 @@ std::pair<bool, bool> checkGenset(Genset* genset, const std::string& stereotype,
 
 void printResult(Pattern pattern, Node* node) {
     
-    std::string patternName;
+   std::string patternName;
     std::string details = "";
 
     switch (pattern) {
-
         case Subkind:
         case Role:
         case Phase:
@@ -374,10 +373,9 @@ void printResult(Pattern pattern, Node* node) {
             else if (pattern == Phase) patternName = "Phase";
             else patternName = "RoleMixin";
 
+       
             if (auto* genset = dynamic_cast<Genset*>(node)) {
-             
                 details += "\nGeneral: " + genset->getMotherClass();
-                
                 details += "\nSpecifics: [";
                 
                 auto specifics = genset->getSpecificClass(); 
@@ -387,7 +385,6 @@ void printResult(Pattern pattern, Node* node) {
                     details += spec;
                     first = false;
                 }
-                
                 details += "]";
             }
             break;
@@ -398,7 +395,6 @@ void printResult(Pattern pattern, Node* node) {
         {
             patternName = (pattern == Relator) ? "Relator" : "Mode";
 
-       
             if (auto* cls = dynamic_cast<Class*>(node)) {
                 details += "\nRelations: ";
                 bool first = true;
@@ -419,9 +415,9 @@ void printResult(Pattern pattern, Node* node) {
             break;
     }
 
-    std::cout << "Pattern Identified: " << patternName << "\n"
+    std::cout << "[Line " << node->getLine() << "] Pattern Identified: " << patternName << "\n"
               << "Element: " << node->getName()
-              << details  
-              << "\n"     
+              << details 
+              << "\n" 
               << std::endl;
 }

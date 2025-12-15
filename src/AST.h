@@ -6,16 +6,20 @@
 class Node {
     std::string name;
     std::list<Node*> children;
+   
+    protected:
+    int line; 
 
 public:
-    Node(std::string name) : name(name) { }
+    Node(std::string name); 
 
     virtual ~Node() = default;
 
     void setName(const std::string& name) { this->name = name; }
-    void add_child(Node* node) { children.push_back(node); }
+    void add_child(Node* node) { children.push_back(node); } 
     const std::string& getName() const { return name; }
     std::list<Node*>& getChildren() { return children; }
+    int getLine() const { return line; }
 };
 
 class Package : public Node {
