@@ -65,27 +65,23 @@ Para compilar e rodar, você precisará das seguintes ferramentas (Linux/WSL):
 
 ## - Como Compilar:
 -O projeto utiliza **CMake**. Para compilar, execute o seguinte comando na raiz do projeto:
-# 1. Gere os arquivos de configuração na pasta 'build'
-cmake -S . -B build
-# 2. Compile o executável
-cmake --build build
+``cmake --build "./out/build/GCC 13.3.0 x86_64-linux-gnu"``
 
 
  ## - Como Executar: 
  - O analisador lê arquivos .tonto;
  #  Comando para executar o projeto: 
- ./build/src/TontoCompiler tests/nome_do_arquivo.tonto
- 
+ ``"./out/build/GCC 13.3.0 x86_64-linux-gnu/src/TontoCompiler" nome_do_arquivo.tonto``
 
 ## 📄 Exemplo de Saída
 
 Abaixo está o resultado real da execução do analisador sobre o arquivo de teste `tests/relator.tonto`:
 
-``
+```
 Pattern Identified: Relator
 Element: Relator_Name
 Relations: (mediation -> Role_Name1), (mediation -> Role_Name2)
-``
+```
 
 ## - Autores:
 - João Pedro Souza Cavalcante;
