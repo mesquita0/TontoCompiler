@@ -5,6 +5,9 @@ class SemanticAnalyzer {
     AST& ast;
     SymbolTable& symbol_table;
 
+    bool checkReferences();
+
+    bool checkGeneralizationCompatibility(Genset* genset);
     void checkSubkind(Genset* genset);
     void checkRole(Genset* genset);
     void checkPhase(Genset* genset);

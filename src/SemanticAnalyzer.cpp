@@ -5,16 +5,42 @@
 #include <utility>
 #include <string>
 
-enum Pattern { Subkind, Role, Phase, Relator, Mode, RoleMixin };
+enum Pattern { 
+    Subkind, Role, Phase, Relator, Mode, RoleMixin 
+};
+
+enum class Stereotype {
+    Kind, Subkind, Phase, Role,
+    Category, RoleMixin, Mixin,
+    Relator, Mode, Invalid
+};
+
+Stereotype getStereotypeEnum(const std::string& s) {
+    if (s == "kind") return Stereotype::Kind;
+    if (s == "subkind") return Stereotype::Subkind;
+    if (s == "phase") return Stereotype::Phase;
+    if (s == "role") return Stereotype::Role;
+    if (s == "category") return Stereotype::Category;
+    if (s == "roleMixin") return Stereotype::RoleMixin;
+    if (s == "mixin") return Stereotype::Mixin;
+    if (s == "relator") return Stereotype::Relator;
+    if (s == "mode") return Stereotype::Mode;
+    return Stereotype::Invalid;
+}
 
 std::pair<bool, bool> checkGenset(Genset* genset, const std::string& stereotype, SymbolTable& st);
 void printResult(Pattern pattern, Node* node);
 
 void SemanticAnalyzer::analyze() {
     ast.consolidate();
+    
+    if (!checkReferences()) return;
 
     for (auto& [name, node] : symbol_table) {
         if (auto* genset = dynamic_cast<Genset*>(node)) {
+            if (!checkGeneralizationCompatibility(genset))
+                continue;
+
             checkSubkind(genset);
             checkRole(genset);
             checkPhase(genset);
@@ -25,6 +51,146 @@ void SemanticAnalyzer::analyze() {
             checkMode(cls);
         }
     }
+}
+
+bool SemanticAnalyzer::checkReferences() {
+    bool valid = true;
+
+    for (auto& [name, node] : symbol_table) {
+        if (auto* genset = dynamic_cast<Genset*>(node)) {
+            // Mother class
+            const std::string& mother = genset->getMotherClass();
+            if (!mother.empty() && !symbol_table.get(mother)) {
+                std::cout << "Undefined class referenced as general class \"" << mother << "\" in Genset \"" << genset->getName() << "\".\n";
+                valid = false;
+            }
+
+            // Specific classes
+            for (const auto& spec : genset->getSpecificClass()) {
+                if (!symbol_table.get(spec)) {
+                    std::cout << "Undefined class referenced as specific class \"" << spec << "\" in Genset \"" << genset->getName() << "\".\n";
+                    valid = false;
+                }
+            }
+        }
+        else if (auto* cls = dynamic_cast<Class*>(node)) {
+            // Superclasses
+            for (const auto& super : cls->getSuperClasses()) {
+                if (!symbol_table.get(super)) {
+                    std::cout << "Undefined superclass \"" << super << "\" referenced by class \"" << cls->getName() << "\".\n";
+                    valid = false;
+                }
+            }
+
+            // Relations
+            for (auto& child : cls->getChildren()) {
+                if (auto* rel = dynamic_cast<Relation*>(child)) {
+                    // Image class
+                    if (!symbol_table.get(rel->getImage())) {
+                        std::cout << "Undefined class \"" << rel->getImage() << "\" referenced in relation of class \"" << cls->getName() << "\".\n";
+                        valid = false;
+                    }
+
+                    // Domain class
+                    if (!rel->isInternal()) {
+                        if (!symbol_table.get(rel->getDomain())) {
+                            std::cout << "Undefined domain class \"" << rel->getDomain() << "\" referenced in external relation.\n";
+                            valid = false;
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    return valid;
+}
+
+bool SemanticAnalyzer::checkGeneralizationCompatibility(Genset* genset) {
+    std::string generalName = genset->getMotherClass();
+    Class* general = (Class*) symbol_table.get(generalName);
+
+    if (!general) return true;
+
+    Stereotype genType = getStereotypeEnum(general->getStereotype());
+
+    for (const auto& specName : genset->getSpecificClass()) {
+        Class* spec = (Class*) symbol_table.get(specName);
+        if (!spec) continue;
+
+        Stereotype specType = getStereotypeEnum(spec->getStereotype());
+
+        bool valid = true;
+        std::string error;
+
+        switch (genType) {
+            case Stereotype::Kind:
+                valid = (specType == Stereotype::Subkind ||
+                         specType == Stereotype::Phase ||
+                         specType == Stereotype::Role
+                        );
+                error = "A Kind can only be specialized by Subkind, Phase, or Role.";
+                break;
+
+            case Stereotype::Subkind:
+                valid = (specType == Stereotype::Subkind ||
+                         specType == Stereotype::Phase ||
+                         specType == Stereotype::Role
+                        );
+                error = "A Subkind can only be specialized by Subkind, Phase, or Role.";
+                break;
+
+            case Stereotype::Phase:
+                valid = (specType == Stereotype::Phase ||
+                         specType == Stereotype::Role
+                        );
+                error = "A Phase can only be specialized by Phase or Role.";
+                break;
+
+            case Stereotype::Role:
+                valid = (specType == Stereotype::Role);
+                error = "A Role can only be specialized by another Role.";
+                break;
+
+            case Stereotype::Category:
+                valid = (specType == Stereotype::Kind ||
+                         specType == Stereotype::Subkind ||
+                         specType == Stereotype::Category
+                        );
+                error = "A Category can only be specialized by Kind, Subkind, or Category.";
+                break;
+
+            case Stereotype::RoleMixin:
+                valid = (specType == Stereotype::Role ||
+                         specType == Stereotype::RoleMixin
+                        );
+                error = "A RoleMixin can only be specialized by Role or RoleMixin.";
+                break;
+
+            case Stereotype::Mixin:
+                valid = (specType == Stereotype::Mixin ||
+                         specType == Stereotype::Category ||
+                         specType == Stereotype::RoleMixin ||
+                         specType == Stereotype::Kind ||
+                         specType == Stereotype::Subkind ||
+                         specType == Stereotype::Phase ||
+                         specType == Stereotype::Role
+                        );
+                error = "A Mixin can only be specialized by Mixins or Sortals.";
+                break;
+
+            default:
+                break;
+        }
+
+        if (!valid) {
+            std::cout << "Invalid generalization in Genset \"" << genset->getName() << "\": "
+                      << specName << " -> " << generalName << ". " << error << "\n";
+            return false;
+        }
+    }
+
+    return true;
 }
 
 void SemanticAnalyzer::checkSubkind(Genset* genset) {

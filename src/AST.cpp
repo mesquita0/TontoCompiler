@@ -91,7 +91,7 @@ void AST::link_relations() {
 
             Node* domain_class  = symbol_table.get(external_relation->getDomain());
             if (!domain_class) {
-                std::cout << "Error: No symbol '" << external_relation->getDomain() << "'.\n";
+                std::cout << "Undefined domain class \"" << external_relation->getDomain() << "\" referenced in external relation.\n";
                 it++;
             }
             else {
